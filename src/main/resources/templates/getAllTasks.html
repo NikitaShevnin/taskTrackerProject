@@ -18,8 +18,9 @@
     </style>
 </head>
 <body>
-<h1>Список задач tasks</h1>
-<!-- Таблица для отображения задач -->
+<h1>Список задач</h1>
+
+<!-- Таблица которая отображает все текущие задачи -->
 <table id="taskTable">
     <thead>
     <tr>
@@ -32,20 +33,12 @@
     </tr>
     </thead>
     <tbody>
-    <tr th:each="task : ${tasks}">
-        <td th:text="${task.id}"></td> <!-- ID задачи -->
-        <td th:text="${task.title}"></td> <!-- Заголовок задачи -->
-        <td th:text="${task.description}"></td> <!-- Описание задачи -->
-        <td th:text="${task.status}"></td> <!-- Статус задачи -->
-        <td th:text="${task.priority}"></td> <!-- Приоритет задачи -->
-        <td>
-            <button onclick="deleteTask([[${task.id}]])">Удалить</button> <!-- Кнопка для удаления задачи -->
-        </td>
-    </tr>
+    <!-- Динамически добавляемые строки с задачами появятся здесь -->
     </tbody>
 </table>
-<!-- Кнопка для создания новой задачи -->
-<button onclick="createTask()">Создать новую задачу</button>
+
+<!-- Кнопка для перехода на страницу создания новой задачи -->
+<button onclick="window.location.href='/tasks/new'">Создать новую задачу</button>
 
 <script>
     // Асинхронная функция для получения задач
@@ -70,26 +63,6 @@
             deleteButton.onclick = () => deleteTask(task.id); // Устанавливаем обработчик на клик
             row.insertCell(5).appendChild(deleteButton); // Добавляем кнопку в ячейку
         });
-    }
-
-    // Асинхронная функция для создания новой задачи
-    async function createTask() {
-        const title = prompt('Введите заголовок задачи:'); // Запрашиваем заголовок
-        const description = prompt('Введите описание задачи:'); // Запрашиваем описание
-        const status = prompt('Введите статус задачи:'); // Запрашиваем статус
-        const priority = prompt('Введите приоритет задачи:'); // Запрашиваем приоритет
-
-        if (title && description) { // Если заголовок и описание не пустые
-            const task = { title, description, status, priority }; // Создаем объект задачи
-            await fetch('/tasks', {
-                method: 'POST', // Указываем метод POST
-                headers: {
-                    'Content-Type': 'application/json' // Указываем заголовок для JSON
-                },
-                body: JSON.stringify(task) // Преобразуем объект в JSON
-            });
-            fetchTasks(); // Обновляем список задач
-        }
     }
 
     // Асинхронная функция для удаления задачи
