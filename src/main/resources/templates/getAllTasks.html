@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task Tracker</title>
+    <style>
+        /* Стили для таблицы задач */
+        table {
+            width: 100%; /* Ширина таблицы 100% от родительского элемента */
+            border-collapse: collapse; /* Убирает двойные границы между ячейками */
+        }
+        th, td {
+            border: 1px solid black; /* Границы ячеек черного цвета */
+            padding: 8px; /* Отступы в ячейках */
+            text-align: left; /* Выравнивание текста по левому краю */
+        }
+    </style>
+</head>
+<body>
+<h1>Список задач tasks</h1>
+<!-- Таблица для отображения задач -->
+<table id="taskTable">
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>Заголовок</th>
+        <th>Описание</th>
+        <th>Статус</th>
+        <th>Приоритет</th>
+        <th>Действия</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="task : ${tasks}">
+        <td th:text="${task.id}"></td> <!-- ID задачи -->
+        <td th:text="${task.title}"></td> <!-- Заголовок задачи -->
+        <td th:text="${task.description}"></td> <!-- Описание задачи -->
+        <td th:text="${task.status}"></td> <!-- Статус задачи -->
+        <td th:text="${task.priority}"></td> <!-- Приоритет задачи -->
+        <td>
+            <button onclick="deleteTask([[${task.id}]])">Удалить</button> <!-- Кнопка для удаления задачи -->
+        </td>
+    </tr>
+    </tbody>
+</table>
+<!-- Кнопка для создания новой задачи -->
+<button onclick="createTask()">Создать новую задачу</button>
+
+<script>
+    // Асинхронная функция для получения задач
+    async function fetchTasks() {
+        const response = await fetch('/tasks'); // Выполняем GET-запрос для получения задач
+        const tasks = await response.json(); // Преобразуем ответ в JSON
+        const tableBody = document.getElementById('taskTable').getElementsByTagName('tbody')[0];
+        tableBody.innerHTML = ''; // Очищаем текущее содержимое таблицы
+
+        // Для каждой задачи добавляем новую строку в таблицу
+        tasks.forEach(task => {
+            const row = tableBody.insertRow(); // Создаем новую строку таблицы
+            row.insertCell(0).innerText = task.id; // Добавляем ID в ячейку
+            row.insertCell(1).innerText = task.title; // Добавляем заголовок в ячейку
+            row.insertCell(2).innerText = task.description; // Добавляем описание в ячейку
+            row.insertCell(3).innerText = task.status; // Добавляем статус в ячейку
+            row.insertCell(4).innerText = task.priority; // Добавляем приоритет в ячейку
+
+            // Создаем кнопку для удаления задачи
+            const deleteButton = document.createElement('button');
+            deleteButton.innerText = 'Удалить'; // Текст на кнопке
+            deleteButton.onclick = () => deleteTask(task.id); // Устанавливаем обработчик на клик
+            row.insertCell(5).appendChild(deleteButton); // Добавляем кнопку в ячейку
+        });
+    }
+
+    // Асинхронная функция для создания новой задачи
+    async function createTask() {
+        const title = prompt('Введите заголовок задачи:'); // Запрашиваем заголовок
+        const description = prompt('Введите описание задачи:'); // Запрашиваем описание
+        const status = prompt('Введите статус задачи:'); // Запрашиваем статус
+        const priority = prompt('Введите приоритет задачи:'); // Запрашиваем приоритет
+
+        if (title && description) { // Если заголовок и описание не пустые
+            const task = { title, description, status, priority }; // Создаем объект задачи
+            await fetch('/tasks', {
+                method: 'POST', // Указываем метод POST
+                headers: {
+                    'Content-Type': 'application/json' // Указываем заголовок для JSON
+                },
+                body: JSON.stringify(task) // Преобразуем объект в JSON
+            });
+            fetchTasks(); // Обновляем список задач
+        }
+    }
+
+    // Асинхронная функция для удаления задачи
+    async function deleteTask(id) {
+        await fetch(`/tasks/${id}`, {
+            method: 'DELETE' // Выполняем DELETE-запрос для удаления задачи по ID
+        });
+        fetchTasks(); // Обновляем список задач
+    }
+
+    fetchTasks(); // Загружаем задачи при загрузке страницы
+</script>
+</body>
+</html>

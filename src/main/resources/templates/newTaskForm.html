@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Создать новую задачу</title>
+</head>
+<body>
+<h1>Создать новую задачу</h1>
+<form id="create-task-form">
+    <label for="title">Название:</label>
+    <input type="text" id="title" required><br>
+
+    <label for="description">Описание:</label>
+    <textarea id="description" required></textarea><br>
+
+    <label for="status">Статус:</label>
+    <input type="text" id="status" value="в ожидании"><br>
+
+    <label for="priority">Приоритет:</label>
+    <input type="text" id="priority" value="высокий"><br>
+
+    <button type="submit">Создать задачу</button>
+</form>
+
+<script>
+    // JavaScript-код для обработки формы и отправки данных на сервер
+    document.getElementById("create-task-form").addEventListener("submit", function(event) {
+        event.preventDefault(); // предотвращаем отправку формы
+
+        // Создаем новый объект задачи
+        const newTask = {
+            title: document.getElementById("title").value,
+            description: document.getElementById("description").value,
+            status: document.getElementById("status").value,
+            priority: document.getElementById("priority").value,
+        };
+
+        // Отправляем POST-запрос на создание задачи
+        fetch("http://localhost:8080/tasks", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(newTask)
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log("Создана новая задача:", data);
+            // Перенаправление на страницу со списком задач
+            window.location.href = 'getAllTasks.html';
+        })
+        .catch(error => console.error("Ошибка при создании задачи:", error));
+    });
+</script>
+</body>
+</html>
