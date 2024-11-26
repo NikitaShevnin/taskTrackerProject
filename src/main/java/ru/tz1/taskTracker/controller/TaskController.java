@@ -11,6 +11,7 @@ import java.util.List;
 
 /**
  * Контроллер для управления задачами в приложении Task Tracker.
+ * Обрабатывает запросы, связанные с созданием, отображением и удалением задач.
  */
 @Controller
 @RequestMapping("/")
@@ -34,7 +35,7 @@ public class TaskController {
     }
 
     /**
-     * Отображает главную страницу.
+     * Отображает главную страницу со списком задач.
      *
      * @param model Модель для передачи данных в шаблон
      * @return Имя HTML-шаблона для главной страницы
@@ -47,15 +48,47 @@ public class TaskController {
     }
 
     /**
+     * Проверяет валидность объекта задачи.
+     * Выполняет проверки минимальной длины заголовка и описания задачи.
+     *
+     * @param task Объект задачи для проверки
+     * @return true, если задача прошла валидацию; false в противном случае
+     */
+    private boolean isValidTask(Task task) {
+        // Простые проверки на валидность
+        if (task.getTitle() == null || task.getTitle().length() < 3) {
+            System.out.println("Validation failed: Title is too short.");
+            return false;
+        }
+        if (task.getDescription() == null || task.getDescription().length() < 10) {
+            System.out.println("Validation failed: Description is too short.");
+            return false;
+        }
+        // Добавьте другие проверки по необходимости
+        return true;
+    }
+
+    /**
      * Создает новую задачу.
+     * Логирует данные, полученные из формы, и проверяет их на валидность.
+     * Если задача валидна, она будет сохранена; в противном случае будет возвращена форма.
      *
      * @param task Объект задачи, полученный из запроса
-     * @return Перенаправление на страницу со списком задач
+     * @return Строка для перенаправления на главную страницу или имя HTML-шаблона для создания задачи
      */
     @PostMapping("/tasks")
     public String createTask(@ModelAttribute Task task) {
-        taskService.createTask(task);
-        return "redirect:/mainPage"; // Перенаправляем на список задач после создания
+        // Логируем полученные данные
+        System.out.println("Received task for creation: " + task);
+
+        // Валидация данных
+        if (isValidTask(task)) {
+            taskService.createTask(task);
+            return "redirect:/mainPage"; // Перенаправляем на список задач после создания
+        } else {
+            // Здесь можно добавить логику для отображения сообщения об ошибке
+            return "newTaskForm"; // Возвращаем на форму с ошибкой
+        }
     }
 
     /**
