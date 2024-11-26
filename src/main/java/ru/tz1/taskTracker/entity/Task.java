@@ -10,29 +10,25 @@ public class Task {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
     private String title;
     private String description;
     private String status; // например, "в ожидании", "в процессе", "завершено"
     private String priority; // например, "высокий", "средний", "низкий"
 
-    @ManyToOne
-    private AppUser author;
-
-    @ManyToOne
-    private AppUser assignee;
-
     @ElementCollection
     private List<String> comments = new ArrayList<>();
 
-    public Task(Long id, String title, String description, String status, String priority, AppUser author, AppUser assignee) {
+    // Конструктор без параметров
+    public Task() {
+    }
+
+    // Конструктор с параметрами
+    public Task(Long id, String title, String description, String status, String priority) {
         this.id = id;
         this.title = title;
         this.description = description;
         this.status = status;
         this.priority = priority;
-        this.author = author;
-        this.assignee = assignee;
     }
 
     public Long getId() {
@@ -73,21 +69,5 @@ public class Task {
 
     public void setPriority(String priority) {
         this.priority = priority;
-    }
-
-    public AppUser getAuthor() {
-        return author;
-    }
-
-    public void setAuthor(AppUser author) {
-        this.author = author;
-    }
-
-    public AppUser getAssignee() {
-        return assignee;
-    }
-
-    public void setAssignee(AppUser assignee) {
-        this.assignee = assignee;
     }
 }

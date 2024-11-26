@@ -60,7 +60,6 @@ public class TaskService {
         task.setDescription(taskDetails.getDescription());
         task.setStatus(taskDetails.getStatus());
         task.setPriority(taskDetails.getPriority());
-        task.setAssignee(taskDetails.getAssignee());
         return taskRepository.save(task);
     }
 

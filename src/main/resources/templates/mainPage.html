@@ -20,7 +20,7 @@
 <body>
 <h1>Список задач</h1>
 
-<!-- Таблица которая отображает все текущие задачи -->
+<!-- Таблица, которая отображает все текущие задачи -->
 <table id="taskTable">
     <thead>
     <tr>
@@ -38,7 +38,7 @@
 </table>
 
 <!-- Кнопка для перехода на страницу создания новой задачи -->
-<button onclick="window.location.href='/tasks/new'">Создать новую задачу</button>
+<button onclick="window.location.href='/new'">Создать новую задачу</button>
 
 <script>
     // Асинхронная функция для получения задач
@@ -67,10 +67,15 @@
 
     // Асинхронная функция для удаления задачи
     async function deleteTask(id) {
-        await fetch(`/tasks/${id}`, {
+        const response = await fetch(`/tasks/${id}`, {
             method: 'DELETE' // Выполняем DELETE-запрос для удаления задачи по ID
         });
-        fetchTasks(); // Обновляем список задач
+
+        if (response.ok) {
+            fetchTasks(); // Обновляем список задач
+        } else {
+            alert('Ошибка при удалении задачи'); // Обработка ошибок
+        }
     }
 
     fetchTasks(); // Загружаем задачи при загрузке страницы

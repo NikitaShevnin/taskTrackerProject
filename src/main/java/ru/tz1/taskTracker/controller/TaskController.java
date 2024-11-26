@@ -13,7 +13,7 @@ import java.util.List;
  * Контроллер для управления задачами в приложении Task Tracker.
  */
 @Controller
-@RequestMapping("/tasks")
+@RequestMapping("/")
 public class TaskController {
 
     private final TaskService taskService;
@@ -34,28 +34,28 @@ public class TaskController {
     }
 
     /**
-     * Отображает все задачи.
+     * Отображает главную страницу.
      *
      * @param model Модель для передачи данных в шаблон
-     * @return Имя HTML-шаблона для отображения списка задач
+     * @return Имя HTML-шаблона для главной страницы
      */
-    @GetMapping
-    public String getAllTasks(Model model) {
+    @GetMapping("/mainPage")
+    public String mainPage(Model model) {
         List<Task> tasks = taskService.getAllTasks();
         model.addAttribute("tasks", tasks);
-        return "getAllTasks"; // Имя HTML-шаблона для списка задач
+        return "mainPage"; // Имя HTML-шаблона для главной страницы
     }
 
     /**
      * Создает новую задачу.
      *
      * @param task Объект задачи, полученный из запроса
-     * @return Созданная задача
+     * @return Перенаправление на страницу со списком задач
      */
-    @PostMapping
-    @ResponseBody
-    public Task createTask(@RequestBody Task task) {
-        return taskService.createTask(task);
+    @PostMapping("/tasks")
+    public String createTask(@ModelAttribute Task task) {
+        taskService.createTask(task);
+        return "redirect:/mainPage"; // Перенаправляем на список задач после создания
     }
 
     /**
@@ -63,8 +63,7 @@ public class TaskController {
      *
      * @param id Идентификатор задачи, которую нужно удалить
      */
-    @DeleteMapping("/{id}")
-    @ResponseBody
+    @DeleteMapping("/tasks/{id}")
     public void deleteTask(@PathVariable Long id) {
         taskService.deleteTask(id);
     }

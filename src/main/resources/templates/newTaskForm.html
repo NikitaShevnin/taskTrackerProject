@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,20 +9,20 @@
 <h1>Создать новую задачу</h1>
 <form id="create-task-form">
     <label for="title">Название:</label>
-    <input type="text" id="title" required><br>
+    <input type="text" id="title" name="title" required><br>
 
     <label for="description">Описание:</label>
-    <textarea id="description" required></textarea><br>
+    <textarea id="description" name="description" required></textarea><br>
 
     <label for="status">Статус:</label>
-    <select id="status" required>
+    <select id="status" name="status" required>
         <option value="в ожидании">в ожидании</option>
         <option value="в процессе">в процессе</option>
         <option value="завершено">завершено</option>
     </select><br>
 
     <label for="priority">Приоритет:</label>
-    <select id="priority" required>
+    <select id="priority" name="priority" required>
         <option value="высокий">высокий</option>
         <option value="средний">средний</option>
         <option value="низкий">низкий</option>
@@ -32,33 +32,76 @@
 </form>
 
 <script>
-    // JavaScript-код для обработки формы и отправки данных на сервер
     document.getElementById("create-task-form").addEventListener("submit", function(event) {
-        event.preventDefault(); // предотвращаем отправку формы
+        event.preventDefault();
+        let isValid = true;
+        let errors = [];
 
-        // Создаем новый объект задачи
+        // Получаем значения из полей
+        const title = document.getElementById("title").value.trim();
+        const description = document.getElementById("description").value.trim();
+        const status = document.getElementById("status").value;
+        const priority = document.getElementById("priority").value;
+
+        // Валидация заголовка
+        if (title.length < 3) {
+            isValid = false;
+            errors.push("Заголовок должен содержать не менее 3 символов.");
+        }
+
+        // Валидация описания
+        if (description.length < 10) {
+            isValid = false;
+            errors.push("Описание должно содержать не менее 10 символов.");
+        }
+
+        // Валидация статуса и приоритета (если необходимо)
+        if (!["в ожидании", "в процессе", "завершено"].includes(status)) {
+            isValid = false;
+            errors.push("Статус выбран некорректно.");
+        }
+
+        if (!["высокий", "средний", "низкий"].includes(priority)) {
+            isValid = false;
+            errors.push("Приоритет выбран некорректно.");
+        }
+
+        // Если данные не валидны, показываем ошибки
+        if (!isValid) {
+            alert(errors.join("\n")); // Объединяем ошибки в строку и выводим
+            return; // Выходим из функции, чтобы не отправлять форму
+        }
+
+        // Создаем новый объект задачи с данными из полей формы
         const newTask = {
-            title: document.getElementById("title").value,
-            description: document.getElementById("description").value,
-            status: document.getElementById("status").value,
-            priority: document.getElementById("priority").value,
+            title: title,
+            description: description,
+            status: status,
+            priority: priority
         };
 
         // Отправляем POST-запрос на создание задачи
-        fetch("http://localhost:8080/tasks", {
+        fetch("/tasks", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
             },
             body: JSON.stringify(newTask)
         })
-        .then(response => response.json())
+        .then(response => {
+            if (response.ok) {
+                return response.json();
+            }
+            throw new Error('Ошибка при создании задачи');
+        })
         .then(data => {
             console.log("Создана новая задача:", data);
-            // Перенаправление на страницу со списком задач
-            window.location.href = 'getAllTasks.html';
+            window.location.href = '/mainPage';
         })
-        .catch(error => console.error("Ошибка при создании задачи:", error));
+        .catch(error => {
+            console.error("Ошибка при создании задачи:", error);
+            alert("Ошибка при создании задачи. Попробуйте еще раз.");
+        });
     });
 </script>
 </body>
