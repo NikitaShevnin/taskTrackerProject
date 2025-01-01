@@ -130,4 +130,35 @@ public class TaskController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error deleting task"); // Возвращаем сообщение об ошибке
         }
     }
+
+    /**
+     * Обновляет существующую задачу.
+     *
+     * @param id Идентификатор задачи, которую нужно обновить
+     * @param task Объект задачи, полученный из запроса
+     * @return ResponseEntity с данными обновленной задачи или сообщение об ошибке
+     */
+    @PutMapping("/tasks/{id}")
+    public ResponseEntity<?> updateTask(@PathVariable Long id, @RequestBody Task task) {
+        // Логируем полученные данные
+        System.out.println("Received request to update task with ID: " + id);
+        System.out.println("Received task data for update: " + task);
+
+        // Валидация данных
+        boolean isValid = isValidTask(task);
+        if (!isValid) {
+            System.out.println("Validation failed for task: " + task);
+            return ResponseEntity.badRequest().body("Invalid task data");
+        }
+
+        // Обновление задачи
+        try {
+            taskService.updateTask(id, task);
+            System.out.println("Task updated successfully: ID = " + id + ", Updated task = " + task);
+            return ResponseEntity.ok().body(task); // Возвращаем обновленную задачу
+        } catch (Exception e) {
+            System.out.println("Error while updating task with ID " + id + ": " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error updating task");
+        }
+    }
 }
