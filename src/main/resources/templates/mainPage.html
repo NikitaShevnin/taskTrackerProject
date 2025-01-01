@@ -40,6 +40,26 @@
 <!-- Кнопка для перехода на страницу создания новой задачи -->
 <button onclick="window.location.href='/new'">Создать новую задачу</button>
 
+<!-- Модальное окно для редактирования задачи -->
+<div id="edit-modal" style="display:none;">
+    <form id="edit-task-form">
+        <input id="edit-title" type="text" placeholder="Заголовок" required>
+        <input id="edit-description" type="text" placeholder="Описание" required>
+        <select id="edit-status">
+            <option value="в ожидании">В ожидании</option>
+            <option value="в процессе">В процессе</option>
+            <option value="завершено">Завершено</option>
+        </select>
+        <select id="edit-priority">
+            <option value="высокий">Высокий</option>
+            <option value="средний">Средний</option>
+            <option value="низкий">Низкий</option>
+        </select>
+        <button type="submit">Сохранить изменения</button>
+        <button type="button" onclick="document.getElementById('edit-modal').style.display='none'">Отмена</button>
+    </form>
+</div>
+
 <script>
     // Асинхронная функция для получения задач
     async function fetchTasks() {
@@ -57,11 +77,20 @@
             row.insertCell(3).innerText = task.status; // Добавляем статус в ячейку
             row.insertCell(4).innerText = task.priority; // Добавляем приоритет в ячейку
 
+            // Создаем ячейку для кнопок "Редактировать" и "Удалить"
+            const actionCell = row.insertCell(5);
+
+            // Создаем кнопку для редактирования задачи
+            const editButton = document.createElement('button');
+            editButton.innerText = 'Редактировать'; // Текст на кнопке
+            editButton.onclick = () => editTask(task.id); // Устанавливаем обработчик на клик
+            actionCell.appendChild(editButton); // Добавляем кнопку в ячейку
+
             // Создаем кнопку для удаления задачи
             const deleteButton = document.createElement('button');
             deleteButton.innerText = 'Удалить'; // Текст на кнопке
             deleteButton.onclick = () => deleteTask(task.id); // Устанавливаем обработчик на клик
-            row.insertCell(5).appendChild(deleteButton); // Добавляем кнопку в ячейку
+            actionCell.appendChild(deleteButton); // Добавляем кнопку в ячейку
         });
     }
 
@@ -75,6 +104,51 @@
             fetchTasks(); // Обновляем список задач
         } else {
             alert('Ошибка при удалении задачи'); // Обработка ошибок
+        }
+    }
+
+    // Асинхронная функция для редактирования задачи
+    async function editTask(id) {
+        const response = await fetch(`/tasks/${id}`);
+        const task = await response.json();
+
+        // Заполняем форму редактирования данными задачи
+        document.getElementById('edit-title').value = task.title;
+        document.getElementById('edit-description').value = task.description;
+        document.getElementById('edit-status').value = task.status;
+        document.getElementById('edit-priority').value = task.priority;
+
+        // Устанавливаем обработчик формы на отправку
+        document.getElementById('edit-task-form').onsubmit = async function(event) {
+            event.preventDefault();
+            await updateTask(id);
+        };
+
+        // Показываем модальное окно для редактирования
+        document.getElementById('edit-modal').style.display = 'block';
+    }
+
+    async function updateTask(id) {
+        const updatedTask = {
+            title: document.getElementById('edit-title').value,
+            description: document.getElementById('edit-description').value,
+            status: document.getElementById('edit-status').value,
+            priority: document.getElementById('edit-priority').value
+        };
+
+        const response = await fetch(`/tasks/${id}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(updatedTask)
+        });
+
+        if (response.ok) {
+            fetchTasks(); // Обновляем список задач
+            document.getElementById('edit-modal').style.display = 'none'; // Закрываем модальное окно
+        } else {
+            alert('Ошибка при обновлении задачи'); // Обработка ошибок
         }
     }
 

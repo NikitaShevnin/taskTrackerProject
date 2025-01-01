@@ -7,7 +7,7 @@
 </head>
 <body>
 <h1>Создать новую задачу</h1>
-<form id="create-task-form">
+<form id="create-task-form" method="POST" action="/tasks">
     <label for="title">Название:</label>
     <input type="text" id="title" name="title" required><br>
 
@@ -50,12 +50,12 @@
         }
 
         // Валидация описания
-        if (description.length < 10) {
+        if (description.length < 5) {
             isValid = false;
-            errors.push("Описание должно содержать не менее 10 символов.");
+            errors.push("Описание должно содержать не менее 5 символов.");
         }
 
-        // Валидация статуса и приоритета (если необходимо)
+        // Валидация статуса и приоритета
         if (!["в ожидании", "в процессе", "завершено"].includes(status)) {
             isValid = false;
             errors.push("Статус выбран некорректно.");
@@ -80,6 +80,8 @@
             priority: priority
         };
 
+        console.log("Создаем новую задачу:", newTask); // Логируем объект задачи
+
         // Отправляем POST-запрос на создание задачи
         fetch("/tasks", {
             method: "POST",
@@ -89,10 +91,16 @@
             body: JSON.stringify(newTask)
         })
         .then(response => {
-            if (response.ok) {
-                return response.json();
+            console.log("Ответ от сервера:", response); // Логируем ответ от сервера
+
+            if (!response.ok) {
+                // Если сервер возвращает ошибку, логируем тело ответа
+                return response.text().then(text => {
+                    console.error("Ошибка на уровне ответа:", text);
+                    throw new Error('Ошибка при создании задачи');
+                });
             }
-            throw new Error('Ошибка при создании задачи');
+            return response.json();
         })
         .then(data => {
             console.log("Создана новая задача:", data);
