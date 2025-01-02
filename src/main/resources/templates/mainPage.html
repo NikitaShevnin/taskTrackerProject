@@ -5,18 +5,47 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Task Tracker</title>
     <style>
-        /* Стили для таблицы задач */
-        table {
-            width: 100%; /* Ширина таблицы 100% от родительского элемента */
-            border-collapse: collapse; /* Убирает двойные границы между ячейками */
-        }
-        th, td {
-            border: 1px solid black; /* Границы ячеек черного цвета */
-            padding: 8px; /* Отступы в ячейках */
-            text-align: left; /* Выравнивание текста по левому краю */
-        }
         h1 {
             text-align: center; /* Центрируем текст заголовка */
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 1);
+            background-color: #d2d2d6;
+            border: 2px solid black; /* Четкая черная граница */
+            border-spacing: 0;
+        }
+
+        th, td {
+            border: 2px solid black; /* Убедитесь, что ячейки тоже имеют границы */
+            padding: 8px; /* Пробелы внутри ячеек */
+        }
+        th {
+            background-color: #36429e; /* Цвет заголовка */
+            color: white; /* Цвет текста заголовка */
+        }
+        tr:hover {
+            background-color: #f1f1f1; /* Цвет при наведении на строку */
+        }
+        button {
+            background-color: #36429e; /* Цвет кнопки */
+            color: white; /* Цвет текста кнопки */
+            border: 1px solid black; /* Чёрная граница кнопки */
+            padding: 10px 20px; /* Отступы в кнопке */
+            border-radius: 5px; /* Скругленные углы у кнопки */
+            cursor: pointer; /* Указатель мыши при наведении */
+            transition: background-color 0.3s, border-color 0.3s; /* Плавный переход цвета */
+            margin-right: 5px; /* Отступ между кнопками */
+        }
+        button:hover {
+            background-color: #218838; /* Цвет кнопки при наведении */
+            border-color: #1e7e34; /* Тень при наведении */
+        }
+        .create-task-button {
+            margin-top: 10px; /* Отступ вниз от таблицы */
         }
     </style>
 </head>
@@ -41,7 +70,7 @@
 </table>
 
 <!-- Кнопка для перехода на страницу создания новой задачи -->
-<button onclick="window.location.href='/new'">Создать новую задачу</button>
+<button class="create-task-button" onclick="window.location.href='/new'">Создать новую задачу</button>
 
 <!-- Модальное окно для редактирования задачи -->
 <div id="edit-modal" style="display:none;">
