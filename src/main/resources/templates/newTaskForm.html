@@ -30,6 +30,7 @@
             font-weight: bold; /* Сделаем текст полужирным */
         }
         input[type="text"],
+        input[type="date"],
         textarea,
         select {
             width: 100%; /* Поля занимают 100% ширины формы */
@@ -78,10 +79,25 @@
         <option value="низкий">низкий</option>
     </select>
 
+    <label for="created-date">Дата создания:</label>
+    <input type="date" id="created-date" name="createdDate" required>
+
+    <label for="deadline">Дата дедлайна:</label>
+    <input type="date" id="deadline" name="deadline" required>
+
+    <label for="comments">Комментарии:</label>
+    <textarea id="comments" name="comments"></textarea>
+
     <button type="submit">Создать задачу</button>
 </form>
 
 <script>
+    // Устанавливаем текущую дату в поле "Дата создания"
+    document.addEventListener("DOMContentLoaded", function() {
+        const today = new Date().toISOString().split('T')[0]; // Получаем текущую дату в формате YYYY-MM-DD
+        document.getElementById("created-date").value = today; // Устанавливаем значение поля
+    });
+
     document.getElementById("create-task-form").addEventListener("submit", function(event) {
         event.preventDefault();
         let isValid = true;
@@ -92,6 +108,9 @@
         const description = document.getElementById("description").value.trim();
         const status = document.getElementById("status").value;
         const priority = document.getElementById("priority").value;
+        const createdDate = document.getElementById("created-date").value;
+        const deadline = document.getElementById("deadline").value;
+        const comments = document.getElementById("comments").value;
 
         // Валидация заголовка
         if (title.length < 3) {
@@ -127,7 +146,10 @@
             title: title,
             description: description,
             status: status,
-            priority: priority
+            priority: priority,
+            createdDate: createdDate,
+            deadline: deadline,
+            comments: Array.isArray(comments) ? comments : [comments]
         };
 
         console.log("Создаем новую задачу:", newTask); // Логируем объект задачи

@@ -76,6 +76,9 @@ public class TaskService {
         task.setDescription(taskDetails.getDescription());
         task.setStatus(taskDetails.getStatus());
         task.setPriority(taskDetails.getPriority());
+        task.setCreatedDate(taskDetails.getCreatedDate()); // Обновление даты создания
+        task.setDeadline(taskDetails.getDeadline()); // Обновление даты дедлайна
+        task.setComments(taskDetails.getComments()); // Обновление комментариев
 
         // Сохраняем обновленную задачу и возвращаем ее
         Task updatedTask = taskRepository.save(task);
