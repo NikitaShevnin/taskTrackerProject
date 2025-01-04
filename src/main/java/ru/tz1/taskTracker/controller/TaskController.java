@@ -161,4 +161,22 @@ public class TaskController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error updating task");
         }
     }
+
+    /**
+     * Обрабатывает GET-запросы для получения задачи по идентификатору.
+     *
+     * @param id Идентификатор задачи, которую необходимо получить.
+     * @return ResponseEntity с объектом задачи, если задача найдена,
+     *         иначе ResponseEntity со статусом 404 (Не найдено).
+     */
+    @GetMapping("/tasks/{id}")
+    @ResponseBody
+    public ResponseEntity<Task> getTaskById(@PathVariable Long id) {
+        Task task = taskService.getTaskById(id);
+        if (task != null) {
+            return ResponseEntity.ok(task);
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
+    }
 }

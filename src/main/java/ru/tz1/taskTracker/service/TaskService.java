@@ -38,10 +38,19 @@ public class TaskService {
      * Получает задачу по идентификатору.
      *
      * @param id идентификатор задачи
-     * @return Опциональная задача, если она найдена, иначе пустое значение
+     * @return задача, если она найдена, иначе null
      */
-    public Optional<Task> getTask(Long id) {
-        return taskRepository.findById(id);
+    public Task getTaskById(Long id) {
+        logger.info("Received request to get task with ID: {}", id);
+        // Ищем задачу по идентификатору
+        Optional<Task> optionalTask = taskRepository.findById(id);
+        if (optionalTask.isPresent()) {
+            logger.info("Task found: {}", optionalTask.get());
+            return optionalTask.get(); // Возвращаем найденную задачу
+        } else {
+            logger.warn("Task not found with ID: {}", id);
+            return null; // Возвращаем null, если задача не найдена
+        }
     }
 
     /**

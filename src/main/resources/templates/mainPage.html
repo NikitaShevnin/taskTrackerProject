@@ -92,14 +92,21 @@
         </select>
         <input id="edit-created-date" type="date" placeholder="Дата создания" required>
         <input id="edit-deadline" type="date" placeholder="Дата дедлайна" required>
-        <textarea id="edit-comments" placeholder="Комментарии"></textarea>
+
+        <!-- Поля для комментариев -->
+        <label for="edit-comments-input">Комментарии:</label>
+        <input type="text" id="edit-comments-input" placeholder="Введите комментарий" />
+        <button type="button" id="add-comment-button">Добавить комментарий</button>
+        <ul id="comments-list"></ul>
+
         <button type="submit">Сохранить изменения</button>
         <button type="button" onclick="document.getElementById('edit-modal').style.display='none'">Отмена</button>
     </form>
 </div>
 
 <script>
-    // Асинхронная функция для получения задач
+    let commentsArray = []; // Массив для хранения комментариев
+
     async function fetchTasks() {
         const response = await fetch('/tasks'); // Выполняем GET-запрос для получения задач
         const tasks = await response.json(); // Преобразуем ответ в JSON
@@ -116,7 +123,7 @@
             row.insertCell(4).innerText = task.priority; // Добавляем приоритет в ячейку
             row.insertCell(5).innerText = new Date(task.createdDate).toLocaleDateString(); // Дата создания
             row.insertCell(6).innerText = new Date(task.deadline).toLocaleDateString(); // Дата дедлайна
-            row.insertCell(7).innerText = task.comments; // Комментарии
+            row.insertCell(7).innerHTML = task.comments.map((comment, index) => `${index + 1} / ${comment} <button onclick="removeComment('${comment}')">Удалить</button>`).join('<br>'); // Отображаем нумерованные комментарии с кнопками удаления
 
             // Создаем ячейку для кнопок "Редактировать" и "Удалить"
             const actionCell = row.insertCell(8);
@@ -151,27 +158,85 @@
     // Асинхронная функция для редактирования задачи
     async function editTask(id) {
         const response = await fetch(`/tasks/${id}`);
+        if (!response.ok) {
+            alert('Ошибка при загрузке задачи');
+            return;
+        }
         const task = await response.json();
 
-        // Заполняем форму редактирования данными задачи
-        document.getElementById('edit-title').value = task.title;
-        document.getElementById('edit-description').value = task.description;
-        document.getElementById('edit-status').value = task.status;
-        document.getElementById('edit-priority').value = task.priority;
-        document.getElementById('edit-created-date').value = task.createdDate.split('T')[0]; // Устанавливаем дату создания
-        document.getElementById('edit-deadline').value = task.deadline.split('T')[0]; // Устанавливаем дедлайн
-        document.getElementById('edit-comments').value = task.comments; // Устанавливаем комментарии
+        if (task) {
+            // Заполняем форму редактирования
+            document.getElementById('edit-title').value = task.title;
+            document.getElementById('edit-description').value = task.description;
+            document.getElementById('edit-status').value = task.status;
+            document.getElementById('edit-priority').value = task.priority;
+            document.getElementById('edit-created-date').value = task.createdDate.split('T')[0]; // Устанавливаем дату создания
+            document.getElementById('edit-deadline').value = task.deadline.split('T')[0]; // Устанавливаем дедлайн
 
-        // Устанавливаем обработчик формы на отправку
-        document.getElementById('edit-task-form').onsubmit = async function(event) {
-            event.preventDefault();
-            await updateTask(id);
-        };
+            // Инициализируем массив комментариев
+            commentsArray = task.comments || []; // Обеспечиваем, что это массив
+            const commentsList = document.getElementById('comments-list');
+            commentsList.innerHTML = ''; // Очищаем предыдущий список
 
-        // Показываем модальное окно для редактирования
-        document.getElementById('edit-modal').style.display = 'block';
+            commentsArray.forEach(comment => {
+                const listItem = document.createElement('li');
+                listItem.innerHTML = `${comment} <button onclick="removeComment('${comment}')">Удалить</button>`; // Добавляем кнопку удаления
+                commentsList.appendChild(listItem);
+            });
+
+            // Устанавливаем обработчик формы на отправку
+            document.getElementById('edit-task-form').onsubmit = async function(event) {
+                event.preventDefault();
+                await updateTask(id);
+            };
+
+            // Устанавливаем обработчик события для кнопки добавления комментария
+            document.getElementById('add-comment-button').onclick = function() {
+                const commentInput = document.getElementById('edit-comments-input');
+                const commentText = commentInput.value.trim();
+
+                if (commentText) {
+                    commentsArray.push(commentText); // Добавляем комментарий в массив
+                    reloadCommentsList(); // Обновляем список комментариев
+                    commentInput.value = ''; // Очищаем поле ввода
+                } else {
+                    alert('Пожалуйста, введите комментарий.');
+                }
+            };
+
+            // Показываем модальное окно для редактирования
+            document.getElementById('edit-modal').style.display = 'block';
+        } else {
+            alert('Задача не найдена');
+        }
     }
 
+    // Функция для удаления комментария
+    function removeComment(commentText) {
+        // Удаляем комментарий из массива
+        commentsArray = commentsArray.filter(comment => comment !== commentText);
+
+        // Перезагружаем список комментариев
+        reloadCommentsList();
+    }
+
+    // Функция для перезагрузки списка комментариев
+    function reloadCommentsList() {
+        const commentsList = document.getElementById('comments-list');
+        commentsList.innerHTML = ''; // Очищаем текущий список
+
+        commentsArray.forEach(comment => {
+            const listItem = document.createElement('li');
+            listItem.innerHTML = `${comment} <button onclick="removeComment('${comment}')">Удалить</button>`;
+            commentsList.appendChild(listItem);
+        });
+    }
+
+    /**
+     * Асинхронная функция для обновления задачи с заданным идентификатором.
+     *
+     * @param {number} id - Идентификатор задачи, которую нужно обновить.
+     */
     async function updateTask(id) {
         const updatedTask = {
             title: document.getElementById('edit-title').value,
@@ -180,8 +245,10 @@
             priority: document.getElementById('edit-priority').value,
             createdDate: document.getElementById('edit-created-date').value,
             deadline: document.getElementById('edit-deadline').value,
-            comments: document.getElementById('edit-comments').value
+            comments: commentsArray // Используем текущий массив комментариев
         };
+
+        console.log('Updating task with data:', updatedTask); // Логируем данные перед отправкой на сервер
 
         const response = await fetch(`/tasks/${id}`, {
             method: 'PUT',
@@ -195,7 +262,7 @@
             fetchTasks(); // Обновляем список задач
             document.getElementById('edit-modal').style.display = 'none'; // Закрываем модальное окно
         } else {
-            alert('Ошибка при обновлении задачи'); // Обработка ошибок
+            alert('Ошибка при обновлении задачи: ' + response.statusText); // Обработка ошибок
         }
     }
 
