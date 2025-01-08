@@ -72,7 +72,6 @@
         <p>Нет аккаунта? <a href="registerNewUser.html">Зарегистрируйтесь</a></p>
     </div>
 </div>
-
 <script>
     document.getElementById("loginForm").addEventListener("submit", function(event) {
         event.preventDefault(); // предотвращаем стандартное поведение формы
@@ -80,7 +79,7 @@
         const email = this.email.value;
         const password = this.password.value;
 
-        // Делаем POST-запрос к вашему API для входа
+        // Делаем POST-запрос для аутентификации
         fetch('/api/auth/login', {
             method: 'POST',
             headers: {
@@ -92,19 +91,24 @@
             })
         })
         .then(response => {
-            if (!response.ok) {
-                throw new Error('Неверные учетные данные');
+            if (response.ok) {
+                return response.text(); // Ожидаем, что токен придет в виде строки
+            } else {
+                return response.text().then(errorMessage => {
+                    throw new Error(errorMessage || "Не удалось выполнить вход");
+                });
             }
-            return response.json();
         })
-        .then(data => {
-            // Сохраните токен (например, в localStorage)
-            localStorage.setItem('token', data);
+        .then(token => {
+            // Сохраняем токен в localStorage
+            localStorage.setItem('token', token);
             alert('Вход выполнен успешно!');
-            // Направьте пользователя на другую страницу или выполните другую логику
+
+            // Перенаправляем на главную страницу
+            window.location.href = 'mainPage.html';
         })
         .catch(error => {
-            alert(error.message);
+            alert(error.message); // Обрабатываем ошибки
         });
     });
 </script>

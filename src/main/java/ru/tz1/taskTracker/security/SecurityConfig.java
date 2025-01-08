@@ -18,16 +18,16 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/registration", "/api/auth/loginPage").permitAll() // Разрешаем доступ к страницам
+                        .requestMatchers("/registration", "/api/auth/loginPage").permitAll()
                         .requestMatchers("/tasks/**").hasRole("USER")
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated())
                 .formLogin(login -> login
-                        .loginPage("/api/auth/loginPage") // Указываем путь к странице входа
+                        .loginPage("/api/auth/loginPage")
                         .permitAll())
                 .logout(logout -> logout.permitAll())
                 .csrf(csrf -> csrf
-                        .ignoringRequestMatchers("/api/auth/login") // Игнорируем CSRF для определенных маршрутов
+                        .ignoringRequestMatchers("/api/auth/login")
                 );
 
         return http.build();
