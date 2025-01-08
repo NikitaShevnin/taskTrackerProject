@@ -8,6 +8,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import ru.tz1.taskTracker.entity.Task;
 import ru.tz1.taskTracker.service.TaskService;
+import ru.tz1.taskTracker.util.JwtUtil;
 
 import java.util.List;
 
@@ -82,16 +83,19 @@ public class TaskController {
         return true;
     }
 
-    /**
-     * Создает новую задачу.
-     * Логирует данные, полученные из формы, и проверяет их на валидность.
-     * Если задача валидна, она будет сохранена; в противном случае возвращается сообщение об ошибке.
-     *
-     * @param task Объект задачи, полученный из запроса
-     * @return ResponseEntity с данными задачи или сообщение об ошибке
-     */
+    @Autowired
+    private JwtUtil jwtUtil;
+
     @PostMapping("/tasks")
-    public ResponseEntity<?> createTask(@RequestBody Task task) {
+    public ResponseEntity<?> createTask(@RequestBody Task task, @RequestHeader("Authorization") String token) {
+        // Извлечение JWT из заголовка
+        String jwtToken = token.replace("Bearer ", "");
+
+        // Проверка валидности токена
+        if (!jwtUtil.validateToken(jwtToken, jwtUtil.extractUsername(jwtToken))) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized: Invalid JWT token");
+        }
+
         // Логируем полученные данные
         System.out.println("Received task for creation: " + task);
 

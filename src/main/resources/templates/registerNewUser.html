@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Аутентификация</title>
+    <title>registerNewUser</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -19,7 +19,7 @@
             border-radius: 8px;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
             padding: 20px;
-            width: 300px;
+            width: 400px;
         }
         h1 {
             text-align: center;
@@ -27,7 +27,8 @@
             margin-bottom: 20px;
         }
         input[type="email"],
-        input[type="password"] {
+        input[type="password"],
+        input[type="text"] {
             width: calc(100% - 22px);
             padding: 10px;
             margin-bottom: 10px;
@@ -47,61 +48,49 @@
         button:hover {
             background-color: #218838;
         }
-        .register-link {
-            text-align: center;
-            margin-top: 10px;
-        }
-        .register-link a {
-            color: #28a745;
-            text-decoration: none;
-        }
-        .register-link a:hover {
-            text-decoration: underline;
-        }
     </style>
 </head>
 <body>
 <div class="container">
-    <h1>Вход</h1>
-    <form id="loginForm">
+    <h1>Регистрация нового пользователя</h1>
+    <form id="registrationForm">
+        <input type="text" name="name" placeholder="Имя" required>
         <input type="email" name="email" placeholder="Электронная почта" required>
         <input type="password" name="password" placeholder="Пароль" required>
-        <button type="submit">Войти</button>
+        <input type="password" name="confirmPassword" placeholder="Подтвердите пароль" required>
+        <button type="submit">Создать аккаунт</button>
     </form>
-    <div class="register-link">
-        <p>Нет аккаунта? <a href="registerNewUser.html">Зарегистрируйтесь</a></p>
-    </div>
 </div>
 
 <script>
-    document.getElementById("loginForm").addEventListener("submit", function(event) {
+    document.getElementById("registrationForm").addEventListener("submit", function(event) {
         event.preventDefault(); // предотвращаем стандартное поведение формы
 
+        const name = this.name.value;
         const email = this.email.value;
         const password = this.password.value;
 
-        // Делаем POST-запрос к вашему API для входа
-        fetch('/api/auth/login', {
+        // Делаем POST-запрос к вашему API для регистрации
+        fetch('/api/auth/register', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
+                name: name,
                 email: email,
                 password: password
             })
         })
         .then(response => {
             if (!response.ok) {
-                throw new Error('Неверные учетные данные');
+                throw new Error('Ошибка регистрации');
             }
             return response.json();
         })
         .then(data => {
-            // Сохраните токен (например, в localStorage)
-            localStorage.setItem('token', data);
-            alert('Вход выполнен успешно!');
-            // Направьте пользователя на другую страницу или выполните другую логику
+            alert('Регистрация выполнена успешно!');
+            // Направьте пользователя на страницу входа или другую
         })
         .catch(error => {
             alert(error.message);
