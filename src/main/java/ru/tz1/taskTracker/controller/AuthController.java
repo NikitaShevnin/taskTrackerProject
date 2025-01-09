@@ -23,12 +23,6 @@ public class AuthController {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    @PostMapping("/register")
-    public ResponseEntity<String> registerUser(@RequestBody User user) {
-        userService.registerUser(user);
-        return ResponseEntity.ok("User registered successfully");
-    }
-
     @PostMapping("/login")
     public ResponseEntity<String> loginUser(@RequestBody User user) {
         User existingUser = userService.findByEmail(user.getEmail());
@@ -39,8 +33,15 @@ public class AuthController {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials");
     }
 
-    @GetMapping("/loginPage")
+    @GetMapping("/login")
     public String showLoginPage() {
+        System.out.println("Accessing the login page");
         return "authenticationPage";
+    }
+
+    @GetMapping("/register")
+    public String showRegistrationPage() {
+        System.out.println("Accessing the registration page");
+        return "registerNewUser";
     }
 }

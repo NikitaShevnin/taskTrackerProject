@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>registerNewUser</title>
+    <title>Регистрация нового пользователя</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -53,11 +53,11 @@
 <body>
 <div class="container">
     <h1>Регистрация нового пользователя</h1>
-    <form id="registrationForm">
+    <form id="registrationForm" action="/api/auth/register" method="POST">
         <input type="text" name="name" placeholder="Имя" required>
-        <input type="email" name="email" placeholder="Электронная почта" required>
-        <input type="password" name="password" placeholder="Пароль" required>
-        <input type="password" name="confirmPassword" placeholder="Подтвердите пароль" required>
+        <input type="email" name="email" placeholder="Электронная почта" required autocomplete="email">
+        <input type="password" name="password" placeholder="Пароль" required autocomplete="new-password">
+        <input type="password" name="confirmPassword" placeholder="Подтвердите пароль" required autocomplete="new-password">
         <button type="submit">Создать аккаунт</button>
     </form>
 </div>
@@ -90,7 +90,8 @@
         })
         .then(data => {
             alert('Регистрация выполнена успешно!');
-            // Направьте пользователя на страницу входа или другую
+            // Перенаправление на страницу входа
+            window.location.href = '/api/auth/loginPage';
         })
         .catch(error => {
             alert(error.message);
