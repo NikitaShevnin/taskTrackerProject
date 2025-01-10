@@ -1,8 +1,12 @@
 package ru.tz1.taskTracker.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import ru.tz1.taskTracker.entity.ResponseMessageDto;
 import ru.tz1.taskTracker.entity.User;
+import ru.tz1.taskTracker.entity.UserRegistrationDto;
 import ru.tz1.taskTracker.service.UserService;
 
 @RestController
@@ -13,32 +17,29 @@ public class UserRegistrationController {
     private UserService userService;
 
     @PostMapping("/register")
-    public String registerUser(@RequestParam String name, @RequestParam String email, @RequestParam String password, @RequestParam String confirmPassword) {
+    public ResponseEntity<ResponseMessageDto> registerUser(@RequestBody UserRegistrationDto userDto) {
         // Проверяем, существует ли пользователь с таким email
-        if (userService.findByEmail(email) != null) {
-            return "redirect:/api/auth/register?error=email_taken"; // Перенаправление с ошибкой
+        if (userService.findByEmail(userDto.getEmail()) != null) {
+            return ResponseEntity.badRequest().body(new ResponseMessageDto("Email уже занят"));
         }
 
         // Если пароли не совпадают
-        if (!password.equals(confirmPassword)) {
-            return "redirect:/api/auth/register?error=password_mismatch"; // Перенаправление с ошибкой
+        if (!userDto.getPassword().equals(userDto.getConfirmPassword())) {
+            return ResponseEntity.badRequest().body(new ResponseMessageDto("Пароли не совпадают"));
         }
 
         // Создаём нового пользователя
         User newUser = new User();
-        newUser.setEmail(email);
-        newUser.setPassword(password);
-        newUser.setRole("USER"); // Установка роли по умолчанию
-
-        // обрабатываем исключения
+        newUser.setEmail(userDto.getEmail());
+        newUser.setPassword(userDto.getPassword());
+        newUser.setRole("USER"); // Установка роли по умолчанию "USER"
         try {
             userService.registerUser(newUser);
         } catch (Exception e) {
             // Логируем ошибку
             System.err.println("Ошибка при регистрации пользователя: " + e.getMessage());
-            return "redirect:/api/auth/register?error=registration_failed"; // Перенаправление с ошибкой
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ResponseMessageDto("Ошибка регистрации"));
         }
-
-        return "redirect:/api/auth/loginPage"; // Перенаправление на страницу входа
+        return ResponseEntity.ok(new ResponseMessageDto("Регистрация прошла успешно"));
     }
 }

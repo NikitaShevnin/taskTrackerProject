@@ -8,7 +8,7 @@ public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long userId;
 
     private String email;
     private String password;
@@ -19,19 +19,20 @@ public class User {
 
     // Полный конструктор
     public User(Long id, String email, String password, String role) {
-        this.id = id;
+        this.userId = id;
         this.email = email;
         this.password = password;
         this.role = role;
     }
 
     // Геттеры и сеттеры
-    public Long getId() {
-        return id;
+
+    public Long getUserid() {
+        return userId;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public void setUserid(Long userid) {
+        this.userId = userid;
     }
 
     public String getEmail() {

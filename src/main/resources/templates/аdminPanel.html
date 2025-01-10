@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Панель администратора</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        .container {
+            width: 80%;
+            margin: auto;
+            overflow: hidden;
+        }
+        header {
+            background: #36429e; /* Измененный цвет */
+            color: #ffffff;
+            padding: 10px 0;
+            text-align: center;
+        }
+        .block {
+            background: #ffffff;
+            border: 2px solid black; /* Черная граница */
+            border-radius: 5px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        h2 {
+            color: #36429e; /* Измененный цвет */
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 10px 0;
+        }
+        th, td {
+            border: 1px solid black; /* Черная граница для ячеек */
+            text-align: left;
+            padding: 8px;
+        }
+        th {
+            background-color: #36429e; /* Измененный цвет */
+            color: white;
+        }
+        .btn {
+            background-color: #36429e; /* Измененный цвет */
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        .comments {
+            margin-top: 20px;
+        }
+        input[type="text"], input[type="date"], textarea {
+            width: 100%; /* Установлено на 100% */
+            padding: 8px;
+            margin-top: 5px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+<header>
+    <h1>Панель администратора</h1>
+</header>
+
+<div class="container">
+    <div class="block">
+        <h2>1. Все задачи в работе</h2>
+        <table>
+            <thead>
+            <tr>
+                <th>Заголовок</th>
+                <th>Описание</th>
+                <th>Статус</th>
+                <th>Приоритет</th>
+                <th>Дата создания</th>
+                <th>Дедлайн</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td>Задача 1</td>
+                <td>Описание задачи 1</td>
+                <td>Выполнено</td>
+                <td>Высокий</td>
+                <td>2023-10-01</td>
+                <td>2023-10-10</td>
+            </tr>
+            <tr>
+                <td>Задача 2</td>
+                <td>Описание задачи 2</td>
+                <td>В процессе</td>
+                <td>Средний</td>
+                <td>2023-09-15</td>
+                <td>2023-10-05</td>
+            </tr>
+            <!-- Дополнительные задачи -->
+            </tbody>
+        </table>
+    </div>
+
+    <div class="block">
+        <h2>2. Управление задачами исполнителей</h2>
+        <label for="username">Имя пользователя:</label>
+        <input type="text" id="username" placeholder="Введите имя пользователя" style="width: calc(100% - 20px); margin: 10px 0;" />
+        <div class="task-list">
+            <table>
+                <thead>
+                <tr>
+                    <th>Заголовок</th>
+                    <th>Описание</th>
+                    <th>Статус</th>
+                    <th>Приоритет</th>
+                    <th>Дата создания</th>
+                    <th>Дедлайн</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td>Задача пользователя 1</td>
+                    <td>Описание задачи пользователя 1</td>
+                    <td>Выполнено</td>
+                    <td>Низкий</td>
+                    <td>2023-08-05</td>
+                    <td>2023-09-05</td>
+                </tr>
+                <tr>
+                    <td>Задача пользователя 2</td>
+                    <td>Описание задачи пользователя 2</td>
+                    <td>В процессе</td>
+                    <td>Высокий</td>
+                    <td>2023-09-01</td>
+                    <td>2023-09-30</td>
+                </tr>
+                <!-- Дополнительные задачи -->
+                </tbody>
+            </table>
+            <button class="btn" onclick="window.location='newTaskFromForAdmin.html';">Поставить задачу</button>
+        </div>
+    </div>
+</div>
+</body>
+</html>

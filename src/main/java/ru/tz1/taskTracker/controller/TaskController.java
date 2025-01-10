@@ -27,22 +27,11 @@ public class TaskController {
         this.taskService = taskService;
     }
 
-    /**
-     * Отображает страницу для создания новой задачи.
-     *
-     * @return Имя HTML-шаблона для создания новой задачи
-     */
     @GetMapping("/new")
     public String showNewTaskForm() {
         return "newTaskForm"; // Имя HTML-шаблона для создания новой задачи
     }
 
-    /**
-     * Отображает главную страницу со списком задач.
-     *
-     * @param model Модель для передачи данных в шаблон
-     * @return Имя HTML-шаблона для главной страницы
-     */
     @GetMapping("/mainPage")
     public String mainPage(Model model) {
         List<Task> tasks = taskService.getAllTasks();
@@ -50,26 +39,13 @@ public class TaskController {
         return "mainPage"; // Имя HTML-шаблона для главной страницы
     }
 
-    /**
-     * Получает список всех задач.
-     *
-     * @return Список задач в формате JSON
-     */
     @GetMapping("/tasks")
     @ResponseBody
     public List<Task> getTasks() {
         return taskService.getAllTasks(); // Возвращаем все задачи
     }
 
-    /**
-     * Проверяет валидность объекта задачи.
-     * Выполняет проверки минимальной длины заголовка и описания задачи.
-     *
-     * @param task Объект задачи для проверки
-     * @return true, если задача прошла валидацию; false в противном случае
-     */
     private boolean isValidTask(Task task) {
-        // Простые проверки на валидность
         if (task.getTitle() == null || task.getTitle().length() < 3) {
             System.out.println("Validation failed: Title is too short. Title: '" + task.getTitle() + "'");
             return false;
@@ -78,7 +54,6 @@ public class TaskController {
             System.out.println("Validation failed: Description is too short. Description: '" + task.getDescription() + "'");
             return false;
         }
-
         System.out.println("Task is valid: " + task);
         return true;
     }
@@ -88,95 +63,66 @@ public class TaskController {
 
     @PostMapping("/tasks")
     public ResponseEntity<?> createTask(@RequestBody Task task, @RequestHeader("Authorization") String token) {
-        // Извлечение JWT из заголовка
         String jwtToken = token.replace("Bearer ", "");
 
-        // Проверка валидности токена
         if (!jwtUtil.validateToken(jwtToken, jwtUtil.extractUsername(jwtToken))) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized: Invalid JWT token");
         }
 
-        // Логируем полученные данные
         System.out.println("Received task for creation: " + task);
 
-        // Валидация данных
         boolean isValid = isValidTask(task);
         if (!isValid) {
-            // Логируем, что задача не валидна
             System.out.println("Validation failed for task: " + task);
             return ResponseEntity.badRequest().body("Invalid task data"); // Возвращаем сообщение об ошибке
         }
 
-        // Сохранение задачи
         try {
             taskService.createTask(task);
             System.out.println("Task created successfully: " + task);
             return ResponseEntity.ok().body(task); // Возвращаем созданную задачу
         } catch (Exception e) {
             System.out.println("Error while creating task: " + e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error creating task"); // Возвращаем сообщение об ошибке
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error creating task");
         }
     }
 
-    /**
-     * Удаляет задачу по заданному идентификатору.
-     *
-     * @param id Идентификатор задачи, которую нужно удалить
-     * @return ResponseEntity с информацией о результате операции
-     */
-    @DeleteMapping("/tasks/{id}")
-    public ResponseEntity<?> deleteTask(@PathVariable Long id) {
+    @DeleteMapping("/tasks/{taskId}") // Изменяем параметр на taskId
+    public ResponseEntity<?> deleteTask(@PathVariable Long taskId) { // Изменяем параметр на taskId
         try {
-            taskService.deleteTask(id); // Удаляем задачу
-            return ResponseEntity.ok().body("Task deleted successfully"); // Возвращаем успешный ответ
+            taskService.deleteTask(taskId); // Удаляем задачу по taskId
+            return ResponseEntity.ok().body("Task deleted successfully");
         } catch (Exception e) {
             System.out.println("Error while deleting task: " + e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error deleting task"); // Возвращаем сообщение об ошибке
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error deleting task");
         }
     }
 
-    /**
-     * Обновляет существующую задачу.
-     *
-     * @param id Идентификатор задачи, которую нужно обновить
-     * @param task Объект задачи, полученный из запроса
-     * @return ResponseEntity с данными обновленной задачи или сообщение об ошибке
-     */
-    @PutMapping("/tasks/{id}")
-    public ResponseEntity<?> updateTask(@PathVariable Long id, @RequestBody Task task) {
-        // Логируем полученные данные
-        System.out.println("Received request to update task with ID: " + id);
+    @PutMapping("/tasks/{taskId}") // Изменяем параметр на taskId
+    public ResponseEntity<?> updateTask(@PathVariable Long taskId, @RequestBody Task task) { // Изменяем параметр на taskId
+        System.out.println("Received request to update task with ID: " + taskId);
         System.out.println("Received task data for update: " + task);
 
-        // Валидация данных
         boolean isValid = isValidTask(task);
         if (!isValid) {
             System.out.println("Validation failed for task: " + task);
             return ResponseEntity.badRequest().body("Invalid task data");
         }
 
-        // Обновление задачи
         try {
-            taskService.updateTask(id, task);
-            System.out.println("Task updated successfully: ID = " + id + ", Updated task = " + task);
+            taskService.updateTask(taskId, task); // Обновляем задачу по taskId
+            System.out.println("Task updated successfully: ID = " + taskId + ", Updated task = " + task);
             return ResponseEntity.ok().body(task); // Возвращаем обновленную задачу
         } catch (Exception e) {
-            System.out.println("Error while updating task with ID " + id + ": " + e.getMessage());
+            System.out.println("Error while updating task with ID " + taskId + ": " + e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error updating task");
         }
     }
 
-    /**
-     * Обрабатывает GET-запросы для получения задачи по идентификатору.
-     *
-     * @param id Идентификатор задачи, которую необходимо получить.
-     * @return ResponseEntity с объектом задачи, если задача найдена,
-     *         иначе ResponseEntity со статусом 404 (Не найдено).
-     */
-    @GetMapping("/tasks/{id}")
+    @GetMapping("/tasks/{taskId}") // Изменяем параметр на taskId
     @ResponseBody
-    public ResponseEntity<Task> getTaskById(@PathVariable Long id) {
-        Task task = taskService.getTaskById(id);
+    public ResponseEntity<Task> getTaskById(@PathVariable Long taskId) { // Изменяем параметр на taskId
+        Task task = taskService.getTaskById(taskId); // Используем taskId для получения задачи
         if (task != null) {
             return ResponseEntity.ok(task);
         } else {

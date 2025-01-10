@@ -5,7 +5,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.tz1.taskTracker.entity.Task;
 import ru.tz1.taskTracker.repository.TaskRepository;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,18 +36,18 @@ public class TaskService {
     /**
      * Получает задачу по идентификатору.
      *
-     * @param id идентификатор задачи
+     * @param taskId идентификатор задачи
      * @return задача, если она найдена, иначе null
      */
-    public Task getTaskById(Long id) {
-        logger.info("Received request to get task with ID: {}", id);
+    public Task getTaskById(Long taskId) {
+        logger.info("Received request to get task with ID: {}", taskId);
         // Ищем задачу по идентификатору
-        Optional<Task> optionalTask = taskRepository.findById(id);
+        Optional<Task> optionalTask = taskRepository.findById(taskId);
         if (optionalTask.isPresent()) {
             logger.info("Task found: {}", optionalTask.get());
             return optionalTask.get(); // Возвращаем найденную задачу
         } else {
-            logger.warn("Task not found with ID: {}", id);
+            logger.warn("Task not found with ID: {}", taskId);
             return null; // Возвращаем null, если задача не найдена
         }
     }
@@ -65,22 +64,22 @@ public class TaskService {
     /**
      * Обновляет существующую задачу.
      *
-     * @param id идентификатор задачи для обновления
+     * @param taskId идентификатор задачи для обновления
      * @param taskDetails новые данные задачи
      * @return обновленная задача
      */
-    public Task updateTask(Long id, Task taskDetails) {
-        logger.info("Received request to update task with ID: {}", id);
+    public Task updateTask(Long taskId, Task taskDetails) {
+        logger.info("Received request to update task with ID: {}", taskId);
 
         // Находим задачу по идентификатору, выбрасываем исключение, если задача не найдена
-        Task task = taskRepository.findById(id)
+        Task task = taskRepository.findById(taskId)
                 .orElseThrow(() -> {
-                    logger.error("Task not found with ID: {}", id);
-                    return new EntityNotFoundException("Task not found with ID: " + id);
+                    logger.error("Task not found with ID: {}", taskId);
+                    return new EntityNotFoundException("Task not found with ID: " + taskId);
                 });
 
         // Обновляем поля задачи
-        logger.info("Updating task with ID: {}", id);
+        logger.info("Updating task with ID: {}", taskId);
         task.setTitle(taskDetails.getTitle());
         task.setDescription(taskDetails.getDescription());
         task.setStatus(taskDetails.getStatus());
@@ -91,7 +90,7 @@ public class TaskService {
 
         // Сохраняем обновленную задачу и возвращаем ее
         Task updatedTask = taskRepository.save(task);
-        logger.info("Task updated successfully: ID = {}, Updated task = {}", id, updatedTask);
+        logger.info("Task updated successfully: ID = {}, Updated task = {}", taskId, updatedTask);
 
         return updatedTask;
     }
@@ -99,9 +98,9 @@ public class TaskService {
     /**
      * Удаляет задачу по идентификатору.
      *
-     * @param id идентификатор задачи, которую нужно удалить
+     * @param taskId идентификатор задачи, которую нужно удалить
      */
-    public void deleteTask(Long id) {
-        taskRepository.deleteById(id);
+    public void deleteTask(Long taskId) {
+        taskRepository.deleteById(taskId);
     }
 }

@@ -69,6 +69,7 @@
         const name = this.name.value;
         const email = this.email.value;
         const password = this.password.value;
+        const confirmPassword = this.confirmPassword.value;
 
         // Делаем POST-запрос к вашему API для регистрации
         fetch('/api/auth/register', {
@@ -76,11 +77,12 @@
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({
-                name: name,
-                email: email,
-                password: password
-            })
+        body: JSON.stringify({
+            name: name,
+            email: email,
+            password: password,
+            confirmPassword: confirmPassword
+        })
         })
         .then(response => {
             if (!response.ok) {
@@ -91,7 +93,7 @@
         .then(data => {
             alert('Регистрация выполнена успешно!');
             // Перенаправление на страницу входа
-            window.location.href = '/api/auth/loginPage';
+            window.location.href = '/api/auth/login';
         })
         .catch(error => {
             alert(error.message);

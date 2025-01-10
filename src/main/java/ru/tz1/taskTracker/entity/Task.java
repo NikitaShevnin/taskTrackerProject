@@ -10,11 +10,15 @@ import java.util.List;
 public class Task {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    /**
+     * TODO Тут я поменял название поля с id на taskId, теперь надо разобраться с тем что бы не было
+     *  проблем в других полях при использовании в других классах.
+     */
+    private Long taskId;
     private String title;
     private String description;
-    private String status; // например, "в ожидании", "в процессе", "завершено"
-    private String priority; // например, "высокий", "средний", "низкий"
+    private String status; // "в ожидании", "в процессе", "завершено"
+    private String priority; // "высокий", "средний", "низкий"
     private LocalDate createdDate; // Дата создания
     private LocalDate deadline; // Дата дедлайна
 
@@ -25,9 +29,10 @@ public class Task {
     public Task() {
     }
 
-    // Конструктор с параметрами
-    public Task(Long id, String title, String description, String status, String priority, LocalDate createdDate, LocalDate deadline, List<String> comments) {
-        this.id = id;
+    public Task(Long taskId, String title, String description, String status,
+                String priority, LocalDate createdDate, LocalDate deadline,
+                List<String> comments) {
+        this.taskId = taskId;
         this.title = title;
         this.description = description;
         this.status = status;
@@ -37,12 +42,12 @@ public class Task {
         this.comments = comments;
     }
 
-    public Long getId() {
-        return id;
+    public Long getTaskId() {
+        return taskId;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public void setTaskId(Long taskId) {
+        this.taskId = taskId;
     }
 
     public String getTitle() {

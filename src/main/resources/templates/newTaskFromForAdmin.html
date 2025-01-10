@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Создать новую задачу</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4; /* Фон всей страницы */
+            margin: 0;
+            padding: 20px; /* Отступ от края страницы */
+        }
+        h1 {
+            text-align: center; /* Центрирование заголовка */
+            color: #333; /* Цвет заголовка */
+        }
+        form {
+            background-color: white; /* Белый фон формы */
+            border: 2px solid #050000; /* Черная граница формы */
+            border-radius: 8px; /* Скругленные углы */
+            padding: 20px; /* Внутренние отступы */
+            max-width: 500px; /* Максимальная ширина формы */
+            margin: 0 auto; /* Центрирование формы на странице */
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Тень для глубины */
+        }
+        label {
+            display: block; /* Каждый label занимает всю ширину */
+            margin: 10px 0 5px; /* Отступы для отступов */
+            font-weight: bold; /* Сделаем текст полужирным */
+        }
+        input[type="text"],
+        input[type="date"],
+        textarea,
+        select {
+            width: 100%; /* Поля занимают 100% ширины формы */
+            padding: 10px; /* Внутренние отступы */
+            margin-bottom: 15px; /* Отступ внизу поля */
+            border: 1px solid #ccc; /* Светло-серая граница */
+            border-radius: 4px; /* Скругленные углы */
+            box-sizing: border-box; /* Включает внутренние отступы в размеры */
+        }
+        button {
+            background-color: #28a745; /* Цвет кнопки */
+            color: white; /* Цвет текста на кнопке */
+            border: none; /* Убираем границу */
+            padding: 10px 15px; /* Отступы на кнопке */
+            border-radius: 5px; /* Скругленные углы */
+            cursor: pointer; /* Указатель мыши при наведении */
+            font-size: 16px; /* Размер шрифта кнопки */
+            transition: background-color 0.3s; /* Плавный переход цвета */
+            display: inline-block; /* Отображение кнопки как блока */
+        }
+        button:hover {
+            background-color: #218838; /* Цвет кнопки при наведении */
+        }
+    </style>
+</head>
+<body>
+<h1>Создать новую задачу</h1>
+<form id="create-task-form" method="POST" action="/tasks">
+    <label for="title">Название:</label>
+    <input type="text" id="title" name="title" required>
+
+    <label for="description">Описание:</label>
+    <textarea id="description" name="description" required></textarea>
+
+    <label for="status">Статус:</label>
+    <select id="status" name="status" required>
+        <option value="в ожидании">в ожидании</option>
+        <option value="в процессе">в процессе</option>
+        <option value="завершено">завершено</option>
+    </select>
+
+    <label for="priority">Приоритет:</label>
+    <select id="priority" name="priority" required>
+        <option value="высокий">высокий</option>
+        <option value="средний">средний</option>
+        <option value="низкий">низкий</option>
+    </select>
+
+    <label for="created-date">Дата создания:</label>
+    <input type="date" id="created-date" name="createdDate" required>
+
+    <label for="deadline">Дата дедлайна:</label>
+    <input type="date" id="deadline" name="deadline" required>
+
+    <label for="executor">Исполнитель:</label>
+    <select id="executor" name="executor" required>
+        <option value="">Выберите исполнителя</option>
+        <option value="user1">Пользователь 1</option>
+        <option value="user2">Пользователь 2</option>
+        <option value="user3">Пользователь 3</option>
+        <!-- Дополнительные пользователи -->
+    </select>
+
+    <label for="comments">Комментарии:</label>
+    <textarea id="comments" name="comments"></textarea>
+
+    <button type="submit">Создать задачу</button>
+</form>
+
+<script>
+    // Устанавливаем текущую дату в поле "Дата создания"
+    document.addEventListener("DOMContentLoaded", function() {
+        const today = new Date().toISOString().split('T')[0]; // Получаем текущую дату в формате YYYY-MM-DD
+        document.getElementById("created-date").value = today; // Устанавливаем значение поля
+    });
+
+    document.getElementById("create-task-form").addEventListener("submit", function(event) {
+        event.preventDefault();
+        let isValid = true;
+        let errors = [];
+
+        // Получаем значения из полей
+        const title = document.getElementById("title").value.trim();
+        const description = document.getElementById("description").value.trim();
+        const status = document.getElementById("status").value;
+        const priority = document.getElementById("priority").value;
+        const createdDate = document.getElementById("created-date").value;
+        const deadline = document.getElementById("deadline").value;
+        const executor = document.getElementById("executor").value;
+        const comments = document.getElementById("comments").value;
+
+        // Валидация заголовка
+        if (title.length < 3) {
+            isValid = false;
+            errors.push("Заголовок должен содержать не менее 3 символов.");
+        }
+
+        // Валидация описания
+        if (description.length < 5) {
+            isValid = false;
+            errors.push("Описание должно содержать не менее 5 символов.");
+        }
+
+        // Валидация статуса и приоритета
+        if (!["в ожидании", "в процессе", "завершено"].includes(status)) {
+            isValid = false;
+            errors.push("Статус выбран некорректно.");
+        }
+
+        if (!["высокий", "средний", "низкий"].includes(priority)) {
+            isValid = false;
+            errors.push("Приоритет выбран некорректно.");
+        }
+
+        // Валидация исполнителя
+        if (!executor) {
+            isValid = false;
+            errors.push("Исполнитель должен быть выбран.");
+        }
+
+        // Если данные не валидны, показываем ошибки
+        if (!isValid) {
+            alert(errors.join("\n")); // Объединяем ошибки в строку и выводим
+            return; // Выходим из функции, чтобы не отправлять форму
+        }
+
+        // Создаем новый объект задачи с данными из полей формы
+        const newTask = {
+            title: title,
+            description: description,
+            status: status,
+            priority: priority,
+            createdDate: createdDate,
+            deadline: deadline,
+            executor: executor,
+            comments: Array.isArray(comments) ? comments : [comments]
+        };
+
+        console.log("Создаем новую задачу:", newTask); // Логируем объект задачи
+
+        // Отправляем POST-запрос на создание задачи
+        fetch("/tasks", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(newTask)
+        })
+        .then(response => {
+            console.log("Ответ от сервера:", response); // Логируем ответ от сервера
+
+            if (!response.ok) {
+                return response.text().then(text => {
+                    console.error("Ошибка на уровне ответа:", text);
+                    throw new Error('Ошибка при создании задачи');
+                });
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log("Создана новая задача:", data);
+            window.location.href = '/mainPage';
+        })
+        .catch(error => {
+            console.error("Ошибка при создании задачи:", error);
+            alert("Ошибка при создании задачи. Попробуйте еще раз.");
+        });
+    });
+</script>
+</body>
+</html>

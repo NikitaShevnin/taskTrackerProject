@@ -6,7 +6,6 @@ public class UserRegistrationDto {
     private String password;
     private String confirmPassword;
 
-    // Геттеры и сеттеры
     public String getName() {
         return name;
     }
