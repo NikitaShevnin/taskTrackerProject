@@ -1,7 +1,6 @@
 package ru.tz1.taskTracker.entity;
 
 import jakarta.persistence.*;
-
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -10,19 +9,21 @@ import java.util.List;
 public class Task {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    /**
-     * TODO Тут я поменял название поля с id на taskId, теперь надо разобраться с тем что бы не было
-     *  проблем в других полях при использовании в других классах.
-     */
     private Long taskId;
     private String title;
     private String description;
+
+    @Column(nullable = false)
     private String status; // "в ожидании", "в процессе", "завершено"
+
+    @Column(nullable = false)
     private String priority; // "высокий", "средний", "низкий"
+
     private LocalDate createdDate; // Дата создания
     private LocalDate deadline; // Дата дедлайна
 
     @ElementCollection
+    @CollectionTable(name = "task_comments", joinColumns = @JoinColumn(name = "task_id"))
     private List<String> comments = new ArrayList<>(); // Список комментариев
 
     // Конструктор без параметров

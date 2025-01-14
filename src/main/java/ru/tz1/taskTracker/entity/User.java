@@ -26,13 +26,12 @@ public class User {
     }
 
     // Геттеры и сеттеры
-
-    public Long getUserid() {
+    public Long getUserId() {
         return userId;
     }
 
-    public void setUserid(Long userid) {
-        this.userId = userid;
+    public void setUserId(Long userId) {
+        this.userId = userId;
     }
 
     public String getEmail() {
