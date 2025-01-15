@@ -7,8 +7,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import ru.tz1.taskTracker.entity.User;
 
-import java.util.Collections;
-
 /**
  * Класс для инициализации администратора нашего сервиса с привилегиями администратора.
  */
@@ -27,6 +25,9 @@ public class AdminUserInitializer implements CommandLineRunner {
     @Value("${admin.password}")
     private String adminPassword;
 
+    @Value("${admin.name}") // Добавляем имя администратора
+    private String adminName;
+
     /**
      * Метод, который будет выполнен при старте приложения.
      * Проверяет, существует ли пользователь с указанной электронной почтой.
@@ -36,19 +37,20 @@ public class AdminUserInitializer implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
         if (userService.findByEmail(adminEmail) == null) {
-            createAdminUser(adminEmail, adminPassword, "ADMIN");
+            createAdminUser(adminEmail, adminPassword, adminName, "ADMIN");
         }
     }
 
     /**
      * Создадим нового пользователя администратора, если его нет
      */
-    private void createAdminUser(String email, String password, String role) {
+    private void createAdminUser(String email, String password, String name, String role) {
         User adminUser = new User();
         adminUser.setEmail(email);
         adminUser.setPassword(passwordEncoder.encode(password));
-        adminUser.setRole(String.valueOf(Collections.singletonList(role)));
+        adminUser.setName(name); // Устанавливаем имя администратора
+        adminUser.setRole(role); // Устанавливаем роль как строку
 
-        userService.registerUser(adminUser);
+        userService.registerUser(adminUser); // Регистрируем пользователя
     }
 }

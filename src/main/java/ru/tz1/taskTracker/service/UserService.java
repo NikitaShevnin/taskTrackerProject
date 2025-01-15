@@ -6,6 +6,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import ru.tz1.taskTracker.entity.User;
 import ru.tz1.taskTracker.repository.UserRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
@@ -17,6 +19,8 @@ public class UserService {
 
     @Autowired
     private PasswordEncoder passwordEncoder; // Используем интерфейс
+
+    private static final Logger logger = LoggerFactory.getLogger(UserService.class);
 
     /**
      * Метод для регистрации нового пользователя.
@@ -46,8 +50,8 @@ public class UserService {
     public void printAllUsers() {
         List<User> users = userRepository.findAll(); // Получаем всех пользователей
         for (User user : users) {
-            System.out.printf("id: %s, Email: %s, Password: %s, Role: %s%n",
-                    user.getUserId(), user.getEmail(), user.getPassword(), user.getRole());
+            System.out.printf("id: %s,Name: %s, Email: %s, Password: %s, Role: %s%n",
+                    user.getUserId(), user.getName(), user.getEmail(), user.getPassword(), user.getRole());
         }
     }
 
@@ -75,6 +79,15 @@ public class UserService {
     }
 
     /**
+     * Метод для полного очищения базы данных в случае если изменится
+     * структура БД и надо будет создать всё заново.
+     */
+    @Transactional
+    public void deleteAllUsers() {
+        userRepository.deleteAll(); // Удаляем всех пользователей
+    }
+
+    /**
      * Метод для хэширования пароля.
      *
      * @param rawPassword сырой (нехэшированный) пароль
@@ -92,10 +105,17 @@ public class UserService {
      * @return true, если пароль валиден, иначе false
      */
     public boolean isPasswordValid(String rawPassword, String encodedPassword) {
+        logger.debug("Checking password validity...");
+        logger.debug("Raw Password: {}", rawPassword);
+        logger.debug("Encoded Password: {}", encodedPassword);
+
         if (!isPasswordHashValid(encodedPassword)) {
             return false; // Невалидный формат хэша
         }
-        return passwordEncoder.matches(rawPassword, encodedPassword);
+
+        boolean matches = passwordEncoder.matches(rawPassword, encodedPassword);
+        logger.debug("Password matches: {}", matches);
+        return matches;
     }
 
     /**

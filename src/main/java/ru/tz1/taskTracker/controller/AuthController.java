@@ -12,6 +12,8 @@ import ru.tz1.taskTracker.entity.User;
 import ru.tz1.taskTracker.service.UserService;
 import ru.tz1.taskTracker.util.JwtUtil;
 
+import java.net.URI;
+
 @Controller
 @RequestMapping("/api/auth")
 public class AuthController {
@@ -36,20 +38,23 @@ public class AuthController {
                     .body(new ErrorResponse("Invalid credentials"));
         }
 
-        // Проверяем пароль через сервисный слой
+        // Логируем пароли для отладки
+        logger.debug("Raw Password: {}", user.getPassword());
+        logger.debug("Encoded Password from DB: {}", existingUser.getPassword());
+
+        // Проверка пароля
         if (!userService.isPasswordValid(user.getPassword(), existingUser.getPassword())) {
             logger.warn("Invalid password for user: {}", user.getEmail());
-            // Логируем пароли для отладки
-            logger.debug("Raw Password: {}", user.getPassword());
-            logger.debug("Encoded Password from DB: {}", existingUser.getPassword());
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(new ErrorResponse("Invalid credentials"));
         }
 
-        // Генерируем JWT-токен
+        // Генерация JWT-токена
         String token = jwtUtil.generateToken(existingUser.getEmail());
         logger.info("User {} successfully logged in", user.getEmail());
-        return ResponseEntity.ok(new LoginResponse(token, existingUser.getRole()));
+
+        // Возвращаем токен, роль и URL для перенаправления
+        return ResponseEntity.ok(new LoginResponse(token, existingUser.getRole(), "/tasks"));
     }
 
     @GetMapping("/login")
@@ -65,10 +70,12 @@ public class AuthController {
     public static class LoginResponse {
         private String token;
         private String role;
+        private String redirectUrl;
 
-        public LoginResponse(String token, String role) {
+        public LoginResponse(String token, String role, String redirectUrl) {
             this.token = token;
             this.role = role;
+            this.redirectUrl = redirectUrl;
         }
 
         public String getToken() {
@@ -77,6 +84,10 @@ public class AuthController {
 
         public String getRole() {
             return role;
+        }
+
+        public String getRedirectUrl() {
+            return redirectUrl;
         }
     }
 

@@ -110,12 +110,8 @@
 
             alert('Вход выполнен успешно!');
 
-            // Перенаправляем на нужную страницу в зависимости от роли
-            if (data.role === 'ADMIN') {
-                window.location.href = 'adminPanel.html';
-            } else {
-                window.location.href = 'mainPage.html';
-            }
+            // Перенаправляем на страницу, указанную в ответе
+            window.location.href = data.redirectUrl;
         })
         .catch(error => {
             console.error("Error during login:", error); // Логируем ошибку

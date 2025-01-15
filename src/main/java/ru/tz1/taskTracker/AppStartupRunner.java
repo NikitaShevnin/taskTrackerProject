@@ -13,7 +13,6 @@ public class AppStartupRunner implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        // Если нужно напечатать оставшихся пользователей (если есть)
-        userService.printAllUsers(); // Вызов метода для вывода оставшихся пользователей в консоль
+        userService.printAllUsers();
     }
 }
