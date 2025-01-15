@@ -3,6 +3,7 @@ package ru.tz1.taskTracker.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import ru.tz1.taskTracker.entity.ResponseMessageDto;
 import ru.tz1.taskTracker.entity.User;
@@ -16,6 +17,9 @@ public class UserRegistrationController {
     @Autowired
     private UserService userService;
 
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
     @PostMapping("/register")
     public ResponseEntity<ResponseMessageDto> registerUser(@RequestBody UserRegistrationDto userDto) {
         // Проверяем, существует ли пользователь с таким email
@@ -28,10 +32,10 @@ public class UserRegistrationController {
             return ResponseEntity.badRequest().body(new ResponseMessageDto("Пароли не совпадают"));
         }
 
-        // Создаём нового пользователя
+        // Создаем нового пользователя
         User newUser = new User();
         newUser.setEmail(userDto.getEmail());
-        newUser.setPassword(userDto.getPassword());
+        newUser.setPassword(passwordEncoder.encode(userDto.getPassword())); // Хешируем пароль перед сохранением
         newUser.setRole("USER"); // Установка роли по умолчанию "USER"
         try {
             userService.registerUser(newUser);

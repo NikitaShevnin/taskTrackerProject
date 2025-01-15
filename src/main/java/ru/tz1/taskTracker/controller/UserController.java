@@ -18,9 +18,9 @@ public class UserController {
         return ResponseEntity.ok("Все ненужные пользователи успешно удалены.");
     }
 
-    @DeleteMapping("/{userId}") // Изменяем параметр на userId
-    public ResponseEntity<String> deleteUser(@PathVariable Long userId) { // Изменяем параметр на userId
-        userService.deleteUserById(userId); // Изменяем вызов метода на userId
-        return ResponseEntity.ok("Пользователь с id " + userId + " успешно удален."); // Изменяем вывод на userId
+    @DeleteMapping("/{userId}")
+    public ResponseEntity<String> deleteUser(@PathVariable Long userId) {
+        userService.deleteUserById(userId);
+        return ResponseEntity.ok("Пользователь с id " + userId + " успешно удален.");
     }
 }

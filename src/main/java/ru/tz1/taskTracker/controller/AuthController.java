@@ -1,5 +1,6 @@
 package ru.tz1.taskTracker.controller;
 
+import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -7,7 +8,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import ru.tz1.taskTracker.entity.User;
 import ru.tz1.taskTracker.service.UserService;
 import ru.tz1.taskTracker.util.JwtUtil;
@@ -22,52 +22,49 @@ public class AuthController {
     @Autowired
     private JwtUtil jwtUtil;
 
-    @Autowired
-    private PasswordEncoder passwordEncoder;
-
     private static final Logger logger = LoggerFactory.getLogger(AuthController.class);
 
     @PostMapping("/login")
-    public ResponseEntity<?> loginUser(@RequestBody User user) {
+    public ResponseEntity<?> loginUser(@RequestBody @Valid User user) {
         logger.info("Login attempt for user: {}", user.getEmail());
 
-        // Логируем входящие данные
-        logger.info("Received email: {}, password: {}", user.getEmail(), user.getPassword());
-
+        // Находим пользователя по email
         User existingUser = userService.findByEmail(user.getEmail());
-
-        // Проверка на null для existingUser
         if (existingUser == null) {
             logger.warn("User not found: {}", user.getEmail());
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ErrorResponse("User not found"));
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new ErrorResponse("Invalid credentials"));
         }
 
-        if (passwordEncoder.matches(user.getPassword(), existingUser.getPassword())) {
-            String token = jwtUtil.generateToken(user.getEmail());
-            logger.info("User {} successfully logged in", user.getEmail());
-            return ResponseEntity.ok(new LoginResponse(token, existingUser.getRole()));
+        // Проверяем пароль через сервисный слой
+        if (!userService.isPasswordValid(user.getPassword(), existingUser.getPassword())) {
+            logger.warn("Invalid password for user: {}", user.getEmail());
+            // Логируем пароли для отладки
+            logger.debug("Raw Password: {}", user.getPassword());
+            logger.debug("Encoded Password from DB: {}", existingUser.getPassword());
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new ErrorResponse("Invalid credentials"));
         }
 
-        logger.warn("Invalid login attempt for user: {}", user.getEmail());
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ErrorResponse("Invalid credentials"));
+        // Генерируем JWT-токен
+        String token = jwtUtil.generateToken(existingUser.getEmail());
+        logger.info("User {} successfully logged in", user.getEmail());
+        return ResponseEntity.ok(new LoginResponse(token, existingUser.getRole()));
     }
 
-    // Метод для отображения страницы аутентификации
     @GetMapping("/login")
     public String showLoginPage() {
         return "authenticationPage";
     }
 
-    // Метод для отображения страницы регистрации
     @GetMapping("/register")
     public String showRegistrationPage() {
         return "registerNewUser";
     }
 
-    // Класс для ответа на запрос входа
     public static class LoginResponse {
         private String token;
-        private String role; // Добавляем поле для роли
+        private String role;
 
         public LoginResponse(String token, String role) {
             this.token = token;
@@ -83,7 +80,6 @@ public class AuthController {
         }
     }
 
-    // Класс для ответа об ошибке
     public static class ErrorResponse {
         private String message;
 
