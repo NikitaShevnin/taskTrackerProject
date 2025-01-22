@@ -8,6 +8,8 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -20,6 +22,8 @@ import java.io.IOException;
  * возвращает статус 401 - Unauthorized.
  */
 public class JwtAuthenticationFilter implements Filter {
+    private static final Logger logger = LoggerFactory.getLogger(JwtAuthenticationFilter.class);
+
     private final String secretKey;
     private final UserDetailsService userDetailsService;
 
@@ -31,12 +35,11 @@ public class JwtAuthenticationFilter implements Filter {
 
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
-        // Можно использовать для инициализации ресурсов при создании фильтра
+        logger.debug("Initializing JwtAuthenticationFilter.");
     }
 
     @Override
-    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
-            throws IOException, ServletException {
+    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
         // Приводим request и response к специфичным типам
         HttpServletRequest httpRequest = (HttpServletRequest) request;
         HttpServletResponse httpResponse = (HttpServletResponse) response;
@@ -45,9 +48,9 @@ public class JwtAuthenticationFilter implements Filter {
         doFilter(httpRequest, httpResponse, chain);
     }
 
-    public void doFilter(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
-            throws IOException, ServletException {
+    public void doFilter(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws IOException, ServletException {
         String authHeader = request.getHeader("Authorization");
+        logger.debug("Authorization Header is: {}", authHeader);
 
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             String token = authHeader.substring(7);
@@ -58,9 +61,13 @@ public class JwtAuthenticationFilter implements Filter {
                 if (username != null) {
                     UserDetails userDetails = userDetailsService.loadUserByUsername(username);
                     var authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+                    logger.debug("Authentication successful for user: {}", username);
                     SecurityContextHolder.getContext().setAuthentication(authentication);
+                } else {
+                    logger.debug("Username extracted from token is null.");
                 }
             } catch (JwtException e) {
+                logger.debug("Token validation failed: {}", e.getMessage());
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                 return;
             }
@@ -70,6 +77,6 @@ public class JwtAuthenticationFilter implements Filter {
 
     @Override
     public void destroy() {
-        // Освобождение ресурсов, если это требуется при уничтожении фильтра
+        logger.debug("Destroying JwtAuthenticationFilter.");
     }
 }
