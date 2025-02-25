@@ -2,6 +2,10 @@ package ru.tz1.taskTracker.entity;
 
 import jakarta.persistence.*;
 
+/**
+ * Класс, представляющий сущность пользователя в приложении Task Tracker.
+ * Содержит информацию об идентификаторе, имени, email, пароле и роли пользователя.
+ */
 @Entity
 @Table(name = "users")
 public class User {
@@ -23,10 +27,19 @@ public class User {
     @Column(name = "role", nullable = false) // Роль (ADMIN или USER)
     private String role;
 
-    // Конструктор по умолчанию (требуется для JPA)
+    /**
+     * Конструктор по умолчанию, требуемый для JPA.
+     */
     public User() {}
 
-    // Полный конструктор
+    /**
+     * Полный конструктор для создания нового пользователя.
+     *
+     * @param name     Имя пользователя.
+     * @param email    Электронная почта пользователя.
+     * @param password Пароль пользователя.
+     * @param role     Роль пользователя (ADMIN или USER).
+     */
     public User(String name, String email, String password, String role) {
         this.name = name;
         this.email = email;

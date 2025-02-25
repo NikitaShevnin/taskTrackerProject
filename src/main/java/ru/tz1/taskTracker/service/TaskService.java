@@ -18,10 +18,10 @@ import java.util.Optional;
 @Service
 public class TaskService {
 
-    private static final Logger logger = LoggerFactory.getLogger(TaskService.class);
+    private static final Logger logger = LoggerFactory.getLogger(TaskService.class); // Инициализируем логгер
 
     @Autowired
-    private TaskRepository taskRepository;
+    private TaskRepository taskRepository; // Репозиторий для работы с задачами
 
     /**
      * Создает новую задачу.
@@ -30,7 +30,7 @@ public class TaskService {
      * @return сохраненная задача
      */
     public Task createTask(Task task) {
-        return taskRepository.save(task);
+        return taskRepository.save(task); // Сохраняем новую задачу и возвращаем ее
     }
 
     /**
@@ -40,14 +40,14 @@ public class TaskService {
      * @return задача, если она найдена, иначе null
      */
     public Task getTaskById(Long taskId) {
-        logger.info("Received request to get task with ID: {}", taskId);
+        logger.info("Received request to get task with ID: {}", taskId); // Логируем получение запроса
         // Ищем задачу по идентификатору
         Optional<Task> optionalTask = taskRepository.findById(taskId);
         if (optionalTask.isPresent()) {
-            logger.info("Task found: {}", optionalTask.get());
+            logger.info("Task found: {}", optionalTask.get()); // Логируем, если задача найдена
             return optionalTask.get(); // Возвращаем найденную задачу
         } else {
-            logger.warn("Task not found with ID: {}", taskId);
+            logger.warn("Task not found with ID: {}", taskId); // Логируем, если задача не найдена
             return null; // Возвращаем null, если задача не найдена
         }
     }
@@ -58,7 +58,7 @@ public class TaskService {
      * @return список задач
      */
     public List<Task> getAllTasks() {
-        return taskRepository.findAll();
+        return taskRepository.findAll(); // Возвращаем список всех задач
     }
 
     /**
@@ -69,28 +69,28 @@ public class TaskService {
      * @return обновленная задача
      */
     public Task updateTask(Long taskId, Task taskDetails) {
-        logger.info("Received request to update task with ID: {}", taskId);
+        logger.info("Received request to update task with ID: {}", taskId); // Логируем запрос на обновление
 
         // Находим задачу по идентификатору, выбрасываем исключение, если задача не найдена
         Task task = taskRepository.findById(taskId)
                 .orElseThrow(() -> {
-                    logger.error("Task not found with ID: {}", taskId);
-                    return new EntityNotFoundException("Task not found with ID: " + taskId);
+                    logger.error("Task not found with ID: {}", taskId); // Логируем ошибку, если задача не найдена
+                    return new EntityNotFoundException("Task not found with ID: " + taskId); // Выбрасываем исключение
                 });
 
-        // Обновляем поля задачи
+        // Обновляем поля задачи с новыми значениями
         logger.info("Updating task with ID: {}", taskId);
-        task.setTitle(taskDetails.getTitle());
-        task.setDescription(taskDetails.getDescription());
-        task.setStatus(taskDetails.getStatus());
-        task.setPriority(taskDetails.getPriority());
+        task.setTitle(taskDetails.getTitle()); // Обновляем название задачи
+        task.setDescription(taskDetails.getDescription()); // Обновляем описание задачи
+        task.setStatus(taskDetails.getStatus()); // Обновляем статус задачи
+        task.setPriority(taskDetails.getPriority()); // Обновляем приоритет задачи
         task.setCreatedDate(taskDetails.getCreatedDate()); // Обновление даты создания
         task.setDeadline(taskDetails.getDeadline()); // Обновление даты дедлайна
         task.setComments(taskDetails.getComments()); // Обновление комментариев
 
-        // Сохраняем обновленную задачу и возвращаем ее
+        // Сохраняем обновленную задачу в репозитории и возвращаем ее
         Task updatedTask = taskRepository.save(task);
-        logger.info("Task updated successfully: ID = {}, Updated task = {}", taskId, updatedTask);
+        logger.info("Task updated successfully: ID = {}, Updated task = {}", taskId, updatedTask); // Логируем успешное обновление
 
         return updatedTask;
     }
@@ -101,6 +101,6 @@ public class TaskService {
      * @param taskId идентификатор задачи, которую нужно удалить
      */
     public void deleteTask(Long taskId) {
-        taskRepository.deleteById(taskId);
+        taskRepository.deleteById(taskId); // Удаляем задачу по идентификатору
     }
 }

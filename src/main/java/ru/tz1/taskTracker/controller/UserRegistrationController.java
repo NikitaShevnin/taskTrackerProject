@@ -8,6 +8,10 @@ import ru.tz1.taskTracker.entity.ResponseMessageDto;
 import ru.tz1.taskTracker.entity.UserRegistrationDto;
 import ru.tz1.taskTracker.service.UserRegistrationService;
 
+/**
+ * Контроллер для регистрации пользователей в приложении Task Tracker.
+ * Обрабатывает запросы, связанные с процессом регистрации нового пользователя.
+ */
 @RestController
 @RequestMapping("/api/auth")
 public class UserRegistrationController {
@@ -15,6 +19,12 @@ public class UserRegistrationController {
     @Autowired
     private UserRegistrationService userRegService;
 
+    /**
+     * Метод для регистрации нового пользователя.
+     *
+     * @param userDto Объект, содержащий данные для регистрации пользователя.
+     * @return ResponseEntity с сообщением о результате регистрации пользователя.
+     */
     @PostMapping("/register")
     public ResponseEntity<ResponseMessageDto> registerUser(@RequestBody UserRegistrationDto userDto) {
         try {

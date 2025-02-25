@@ -1,95 +1,101 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Аутентификация</title>
+    <meta charset="UTF-8"> <!-- Устанавливаем кодировку документа -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- Настройки для адаптивного дизайна -->
+    <title>Аутентификация</title> <!-- Заголовок страницы -->
     <style>
+        /* Основные стили для страницы */
         body {
-            font-family: Arial, sans-serif;
-            background-color: #f7f7f7;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
+            font-family: Arial, sans-serif; /* Шрифт для всего документа */
+            background-color: #f7f7f7; /* Цвет фона страницы */
+            display: flex; /* Использование флексов для выравнивания */
+            justify-content: center; /* Выравнивание по горизонтали */
+            align-items: center; /* Выравнивание по вертикали */
+            height: 100vh; /* Высота в 100% от высоты окна */
+            margin: 0; /* Убираем отступы */
         }
         .container {
-            background-color: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            padding: 20px;
-            width: 300px;
+            background-color: white; /* Цвет фона для контейнера */
+            border-radius: 8px; /* Закругление углов */
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Тень для контейнера */
+            padding: 20px; /* Внутренние отступы */
+            width: 300px; /* Ширина контейнера */
         }
         h1 {
-            text-align: center;
-            font-weight: bold;
-            margin-bottom: 20px;
+            text-align: center; /* Выравнивание заголовка по центру */
+            font-weight: bold; /* Жирный шрифт для заголовка */
+            margin-bottom: 20px; /* Отступ снизу */
         }
+        /* Стили для полей ввода */
         input[type="email"],
         input[type="password"] {
-            width: calc(100% - 22px);
-            padding: 10px;
-            margin-bottom: 10px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
+            width: calc(100% - 22px); /* Ширина полей ввода */
+            padding: 10px; /* Внутренние отступы */
+            margin-bottom: 10px; /* Отступ снизу */
+            border: 1px solid #ccc; /* Цвет рамки */
+            border-radius: 4px; /* Закругление углов полей */
         }
+        /* Стили для кнопки */
         button {
-            width: 100%;
-            padding: 10px;
-            background-color: #28a745;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            font-size: 16px;
-            cursor: pointer;
+            width: 100%; /* Ширина кнопки */
+            padding: 10px; /* Внутренние отступы */
+            background-color: #28a745; /* Цвет фона кнопки */
+            color: white; /* Цвет текста */
+            border: none; /* Убираем рамку */
+            border-radius: 4px; /* Закругление углов */
+            font-size: 16px; /* Размер шрифта */
+            cursor: pointer; /* Курсор в виде указателя при наведении */
         }
+        /* Эффект при наведении на кнопку */
         button:hover {
-            background-color: #218838;
+            background-color: #218838; /* Цвет кнопки при наведении */
         }
+        /* Стили для ссылки на регистрацию */
         .register-link {
-            text-align: center;
-            margin-top: 10px;
+            text-align: center; /* Выравнивание по центру */
+            margin-top: 10px; /* Отступ сверху */
         }
         .register-link a {
-            color: #28a745;
-            text-decoration: none;
+            color: #28a745; /* Цвет ссылки */
+            text-decoration: none; /* Убираем подчеркивание */
         }
         .register-link a:hover {
-            text-decoration: underline;
+            text-decoration: underline; /* Подчеркивание ссылки при наведении */
         }
     </style>
 </head>
 <body>
 <div class="container">
-    <h1>Вход</h1>
-    <form id="loginForm" method="POST">
-        <input type="email" name="email" placeholder="Электронная почта" required autocomplete="email">
-        <input type="password" name="password" autocomplete="current-password" placeholder="Пароль" required>
-        <button type="submit">Войти</button>
+    <h1>Вход</h1> <!-- Заголовок формы -->
+    <form id="loginForm" method="POST"> <!-- Форма для входа -->
+        <input type="email" name="email" placeholder="Электронная почта" required autocomplete="email"> <!-- Поле для ввода электронной почты -->
+        <input type="password" name="password" autocomplete="current-password" placeholder="Пароль" required> <!-- Поле для ввода пароля -->
+        <button type="submit">Войти</button> <!-- Кнопка для отправки формы -->
     </form>
     <div class="register-link">
-        <p>Нет аккаунта? <a href="/api/auth/register">Зарегистрируйтесь</a></p>
+        <p>Нет аккаунта? <a href="/api/auth/register">Зарегистрируйтесь</a></p> <!-- Ссылка на регистрацию -->
     </div>
 </div>
 <script>
+    // Обработчик события отправки формы
     document.getElementById("loginForm").addEventListener("submit", function(event) {
         event.preventDefault(); // предотвращаем стандартное поведение формы
 
-        const email = this.email.value;
-        const password = this.password.value;
+        const email = this.email.value; // Получаем введённый email
+        const password = this.password.value; // Получаем введённый пароль
 
-        console.log("Logging in with:", { email });
+        console.log("Logging in with:", { email }); // Логируем email для входа
 
         // Делаем POST-запрос для аутентификации
         fetch('/api/auth/login', {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json' // Указываем тип передаваемых данных
             },
             body: JSON.stringify({
                 email: email,
-                password: password
+                password: password // Отправляем email и пароль в запросе
             })
         })
         .then(response => {
@@ -108,10 +114,13 @@
             // Сохраняем токен в localStorage
             localStorage.setItem('token', data.token);
 
-            alert('Вход выполнен успешно!');
+            alert('Вход выполнен успешно!'); // Уведомление об успешном входе
 
             // Перенаправляем на страницу, указанную в ответе
             window.location.href = data.redirectUrl;
+
+            // Вызываем функцию для получения защищенного ресурса (опционально)
+            fetchProtectedResource();
         })
         .catch(error => {
             console.error("Error during login:", error); // Логируем ошибку
@@ -121,34 +130,42 @@
 
     // Функция для получения токена
     function getToken() {
-        return localStorage.getItem('token');
+        return localStorage.getItem('token'); // Получаем токен из localStorage
     }
 
     // Функция для выполнения защищённого запроса
     function fetchProtectedResource() {
         const token = getToken();
+        if (!token) {
+            console.error("Token not found."); // Логируем ошибку, если токен не найден
+            alert("Please log in again."); // Уведомление о необходимости повторного входа
+            return; // Если токен не найден, выходим из функции
+        }
         fetch('http://localhost:8080/tasks', {
             method: 'GET',
             headers: {
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json'
+                'Authorization': `Bearer ${token}`, // Передаем токен в заголовках запроса
+                'Content-Type': 'application/json' // Указываем тип запрашиваемых данных
             }
         })
         .then(response => {
-            console.log("Response status:", response.status);
+            console.log("Response status:", response.status); // Логируем статус ответа
             if (response.ok) {
-                return response.json();
+                return response.json(); // Если ответ успешный, получаем данные
             } else {
-                throw new Error("Access denied. Please log in again.");
+                return response.json().then(data => {
+                    console.error("Error response:", data); // Логируем ошибку ответа
+                    throw new Error(data.message || "Access denied. Please log in again."); // Выбрасываем ошибку
+                });
             }
         })
         .then(data => {
-            console.log("Protected resource data:", data);
+            console.log("Protected resource data:", data); // Логируем данные защищённого ресурса
             // Здесь вы можете обработать данные защищенного ресурса
         })
         .catch(error => {
-            console.error("Error fetching protected resource:", error);
-            alert(error.message);
+            console.error("Error fetching protected resource:", error); // Логируем ошибку
+            alert(error.message); // Уведомление об ошибке
         });
     }
 </script>

@@ -5,11 +5,17 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Класс, представляющий объект рабочей задачи в приложении Task Tracker.
+ * Содержит информацию о заголовке, описании, статусе, приоритете и других атрибутах задачи.
+ */
 @Entity
 public class Task {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long taskId;
+
     private String title;
     private String description;
 
@@ -26,10 +32,24 @@ public class Task {
     @CollectionTable(name = "task_comments", joinColumns = @JoinColumn(name = "task_id"))
     private List<String> comments = new ArrayList<>(); // Список комментариев
 
-    // Конструктор без параметров
+    /**
+     * Конструктор без параметров для создания экземпляра задачи.
+     */
     public Task() {
     }
 
+    /**
+     * Конструктор для создания экземпляра задачи с заданными параметрами.
+     *
+     * @param taskId      Идентификатор задачи.
+     * @param title       Заголовок задачи.
+     * @param description Описание задачи.
+     * @param status      Статус задачи.
+     * @param priority    Приоритет задачи.
+     * @param createdDate Дата создания задачи.
+     * @param deadline    Дата дедлайна задачи.
+     * @param comments    Список комментариев к задаче.
+     */
     public Task(Long taskId, String title, String description, String status,
                 String priority, LocalDate createdDate, LocalDate deadline,
                 List<String> comments) {

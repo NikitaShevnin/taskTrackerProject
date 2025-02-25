@@ -12,6 +12,10 @@ import ru.tz1.taskTracker.entity.User;
 import ru.tz1.taskTracker.service.UserService;
 import ru.tz1.taskTracker.util.JwtUtil;
 
+/**
+ * Контроллер для обработки аутентификации пользователей.
+ * Предоставляет методы для входа в систему и регистрации пользователей.
+ */
 @Controller
 @RequestMapping("/api/auth")
 public class AuthController {
@@ -24,6 +28,13 @@ public class AuthController {
 
     private static final Logger logger = LoggerFactory.getLogger(AuthController.class);
 
+    /**
+     * Метод для входа пользователя в систему.
+     *
+     * @param user объект пользователя с данными для аутентификации, должен быть действительным
+     * @return ResponseEntity, содержащий JWT-токен и информацию о пользователе, если аутентификация прошла успешно,
+     *         или сообщение об ошибке в противном случае.
+     */
     @PostMapping("/login")
     public ResponseEntity<?> loginUser(@RequestBody @Valid User user) {
         logger.info("Login attempt for user: {}", user.getEmail());
@@ -56,20 +67,33 @@ public class AuthController {
         return ResponseEntity.ok(new LoginResponse(token, existingUser.getRole(), "/tasks"));
     }
 
+    /**
+     * Метод для отображения страницы входа в систему.
+     *
+     * @return имя страницы для отображения.
+     */
     @GetMapping("/login")
     public String showLoginPage() {
         return "authenticationPage";
     }
 
+    /**
+     * Метод для отображения страницы регистрации.
+     *
+     * @return имя страницы для отображения.
+     */
     @GetMapping("/register")
     public String showRegistrationPage() {
         return "registerNewUser";
     }
 
+    /**
+     * Вложенный класс для представления успешного ответа на вход в систему.
+     */
     public static class LoginResponse {
-        private String token;
-        private String role;
-        private String redirectUrl;
+        private final String token;
+        private final String role;
+        private final String redirectUrl;
 
         public LoginResponse(String token, String role, String redirectUrl) {
             this.token = token;
@@ -90,6 +114,9 @@ public class AuthController {
         }
     }
 
+    /**
+     * Вложенный класс для представления сообщения об ошибке.
+     */
     public static class ErrorResponse {
         private String message;
 

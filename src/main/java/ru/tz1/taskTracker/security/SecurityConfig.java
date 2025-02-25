@@ -17,10 +17,9 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import java.io.IOException;
 
 /**
- * Конфигурация безопасности, которая регулирует, какие URL-адреса защищены,
- * а какие разрешены для анонимного доступа. Этот класс добавляет JwtAuthenticationFilter
- * перед фильтром для аутентификации по имени и паролю. Также здесь определяются настройки
- * для обработки доступов и исключений.
+ * Конфигурация безопасности приложения, регулирующая доступ к URL-адресам.
+ * Этот класс настраивает фильтрацию, аутентификацию и обработку доступа,
+ * включая добавление JwtAuthenticationFilter перед фильтром для аутентификации по имени и паролю.
  */
 @Configuration
 @EnableWebSecurity
@@ -31,12 +30,35 @@ public class SecurityConfig {
 
     private final String secretKey = "WorkSecretKey";
 
+    /**
+     * Определяет цепочку фильтров безопасности.
+     *
+     * @param http Объект HttpSecurity для настройки фильтров безопасности.
+     * @return Настроенная SecurityFilterChain.
+     * @throws Exception При возникновении ошибок настройки.
+     */
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         configureHttpSecurity(http);
         return http.build();
     }
 
+    /**
+     * Определяет менеджер паролей, использующий BCrypt для хеширования паролей.
+     *
+     * @return Объект PasswordEncoder.
+     */
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+
+    /**
+     * Настраивает правила доступа к различным URL-адресам и параметры безопасности.
+     *
+     * @param http Объект HttpSecurity для настройки.
+     * @throws Exception При возникновении ошибок настройки.
+     */
     private void configureHttpSecurity(HttpSecurity http) throws Exception {
         http.authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/login").permitAll()
@@ -70,24 +92,45 @@ public class SecurityConfig {
         http.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
     }
 
+    /**
+     * Создает экземпляр JwtAuthenticationFilter с указанным секретным ключом и сервисом пользователей.
+     *
+     * @return Настроенный JwtAuthenticationFilter.
+     */
     @Bean
     public JwtAuthenticationFilter jwtAuthenticationFilter() {
         return new JwtAuthenticationFilter(secretKey, userDetailsService);
     }
 
+    /**
+     * Обрабатывает случаи несанкционированного доступа, отправляя статус 401.
+     *
+     * @param request Входящий HTTP-запрос.
+     * @param response Исходящий HTTP-ответ.
+     * @throws IOException При ошибках ввода-вывода.
+     */
     private void handleUnauthorizedAccess(HttpServletRequest request, HttpServletResponse response) throws IOException {
         response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized");
     }
 
+    /**
+     * Обрабатывает случаи отказа в доступе, отправляя статус 403.
+     *
+     * @param request Входящий HTTP-запрос.
+     * @param response Исходящий HTTP-ответ.
+     * @throws IOException При ошибках ввода-вывода.
+     */
     private void handleAccessDenied(HttpServletRequest request, HttpServletResponse response) throws IOException {
         response.sendError(HttpServletResponse.SC_FORBIDDEN, "Access Denied");
     }
 
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
-
+    /**
+     * Создает менеджер аутентификации и настраивает пользователей для аутентификации в памяти.
+     *
+     * @param http Объект HttpSecurity для настройки.
+     * @return Настроенный AuthenticationManager.
+     * @throws Exception При возникновении ошибок настройки.
+     */
     @Bean
     public AuthenticationManager authManager(HttpSecurity http) throws Exception {
         AuthenticationManagerBuilder authenticationManagerBuilder =
@@ -96,6 +139,12 @@ public class SecurityConfig {
         return authenticationManagerBuilder.build();
     }
 
+    /**
+     * Конфигурирует аутентификацию, создавая пользователей в памяти.
+     *
+     * @param auth Объект AuthenticationManagerBuilder для настройки.
+     * @throws Exception При возникновении ошибок настройки.
+     */
     private void configureAuthentication(AuthenticationManagerBuilder auth) throws Exception {
         auth.inMemoryAuthentication()
                 .withUser("user").password(passwordEncoder().encode("password")).roles("USER")
