@@ -8,6 +8,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -27,8 +28,14 @@ public class SecurityConfig {
 
     @Autowired
     private UserDetailsService userDetailsService;
-
+    private JwtAuthenticationFilter jwtAuthenticationFilter;
     private final String secretKey = "WorkSecretKey";
+
+
+    @Autowired
+    public SecurityConfig(JwtAuthenticationFilter jwtAuthenticationFilter) {
+        this.jwtAuthenticationFilter = jwtAuthenticationFilter;
+    }
 
     /**
      * Определяет цепочку фильтров безопасности.
@@ -38,8 +45,24 @@ public class SecurityConfig {
      * @throws Exception При возникновении ошибок настройки.
      */
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        configureHttpSecurity(http);
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        http
+                // Отключаем CSRF, так как приложение использует JWT (без состояния)
+                .csrf(csrf -> csrf.disable())
+                // Настраиваем управление сессиями как STATELESS
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                // Настраиваем авторизацию запросов
+                .authorizeHttpRequests(authz -> authz
+                        // Разрешаем доступ к эндпоинтам аутентификации и H2 консоли
+                        .requestMatchers("/api/auth/**", "/h2-console/**").permitAll()
+                        .anyRequest().authenticated()
+                )
+                // Регистрируем JWT фильтр перед стандартным фильтром аутентификации
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+
+        // Дополнительная настройка для H2 консоли (если используется)
+        http.headers(headers -> headers.frameOptions(frameOptions -> frameOptions.sameOrigin()));
+
         return http.build();
     }
 
