@@ -64,7 +64,7 @@ public class AuthController {
         logger.info("User {} successfully logged in", user.getEmail());
 
         // Возвращаем токен, роль и URL для перенаправления
-        return ResponseEntity.ok(new LoginResponse(token, existingUser.getRole(), "/tasks"));
+        return ResponseEntity.ok(new LoginResponse(token, existingUser.getRole(), "/mainPage"));
     }
 
     /**

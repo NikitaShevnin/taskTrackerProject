@@ -334,3 +334,11 @@ create table users (user_id bigint, email varchar(255), name varchar(255) genera
 org.h2.jdbc.JdbcSQLSyntaxErrorException: Таблица "USERS" не найдена
 Table "USERS" not found; SQL statement:
 select u1_0.name,u1_0.email,u1_0.password,u1_0.role,u1_0.user_id from users u1_0 where u1_0.email=? [42102-224]
+2025-05-14 12:07:43.041603+03:00 jdbc[13]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Синтаксическая ошибка в выражении SQL "[*]USER_ID"; ожидалось "UPDATE"
+Syntax error in SQL statement "[*]USER_ID"; expected "UPDATE"; SQL statement:
+USER_ID [42001-224]
+2025-05-14 12:07:45.698839+03:00 jdbc[13]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Синтаксическая ошибка в выражении SQL "[*]USER_ID"; ожидалось "UPDATE"
+Syntax error in SQL statement "[*]USER_ID"; expected "UPDATE"; SQL statement:
+USER_ID [42001-224]
