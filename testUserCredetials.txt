@@ -1,3 +1,0 @@
-name: ordinaryUser
-email: ordinaryUser@gmail.com
-pass: 1234

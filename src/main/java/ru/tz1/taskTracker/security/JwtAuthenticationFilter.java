@@ -48,6 +48,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         logger.info("Entering doFilter for request: {}", request.getRequestURI());
         String authHeader = request.getHeader("Authorization");
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            String tokenParam = request.getParameter("token");
+            if (tokenParam != null && !tokenParam.isBlank()) {
+                authHeader = "Bearer " + tokenParam;
+            }
+        }
         logger.debug("Authorization Header is: {}", authHeader);
 
         if (authHeader != null && authHeader.startsWith("Bearer ")) {

@@ -34,8 +34,11 @@ public class UserService {
      * @return зарегистрированный пользователь
      */
     public User registerUser(User user) {
-        user.setPassword(encodePassword(user.getPassword())); // Хэшируем пароль
-        return userRepository.save(user); // Сохраняем пользователя в репозитории
+        logger.info("Registering new user with email: {}", user.getEmail());
+        user.setPassword(encodePassword(user.getPassword()));
+        User saved = userRepository.save(user);
+        logger.info("User registered successfully: {}", user.getEmail());
+        return saved;
     }
 
     /**
@@ -68,9 +71,11 @@ public class UserService {
     @Transactional
     public void deleteUserById(Long userId) {
         if (userRepository.existsById(userId)) {
-            userRepository.deleteById(userId); // Удаляем пользователя по ID
+            logger.info("Deleting user with id {}", userId);
+            userRepository.deleteById(userId);
         } else {
-            throw new IllegalArgumentException("Пользователь с id " + userId + " не найден."); // Выбрасываем исключение, если пользователь не найден
+            logger.warn("User with id {} not found", userId);
+            throw new IllegalArgumentException("Пользователь с id " + userId + " не найден.");
         }
     }
 
@@ -79,8 +84,9 @@ public class UserService {
      */
     @Transactional
     public void deleteNonAdminUsers() {
-        List<User> nonAdminUsers = userRepository.findByRoleNot("ADMIN"); // Находим всех пользователей, кроме администраторов
-        userRepository.deleteAll(nonAdminUsers); // Удаляем найденных пользователей
+        logger.info("Deleting non-admin users");
+        List<User> nonAdminUsers = userRepository.findByRoleNot("ADMIN");
+        userRepository.deleteAll(nonAdminUsers);
     }
 
     /**
@@ -89,7 +95,8 @@ public class UserService {
      */
     @Transactional
     public void deleteAllUsers() {
-        userRepository.deleteAll(); // Удаляем всех пользователей
+        logger.warn("Deleting all users from database");
+        userRepository.deleteAll();
     }
 
     /**

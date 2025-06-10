@@ -74,7 +74,7 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 // Настраиваем авторизацию запросов
                 .authorizeHttpRequests(authz -> authz
-                        .requestMatchers("/api/auth/**", "/h2-console/**", "/favicon.ico", "/error", "/tasks.html", "/mainPage").permitAll()
+                        .requestMatchers("/api/auth/**", "/h2-console/**", "/favicon.ico", "/error", "/tasks.html").permitAll()
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
