@@ -76,6 +76,8 @@
 
 <!-- Кнопка для перехода на страницу создания новой задачи -->
 <button class="create-task-button" onclick="window.location.href='/new'">Создать новую задачу</button>
+<!-- Кнопка для выхода на страницу авторизации -->
+<button class="create-task-button" onclick="logout()">Выйти</button>
 
 <!-- Модальное окно для редактирования задачи -->
 <div id="edit-modal" style="display:none;">
@@ -123,14 +125,14 @@
         // Для каждой задачи добавляем новую строку в таблицу
         tasks.forEach(task => {
             const row = tableBody.insertRow(); // Создаем новую строку таблицы
-            row.insertCell(0).innerText = task.id; // Добавляем ID в ячейку
+            row.insertCell(0).innerText = task.taskId; // Добавляем ID в ячейку
             row.insertCell(1).innerText = task.title; // Добавляем заголовок в ячейку
             row.insertCell(2).innerText = task.description; // Добавляем описание в ячейку
             row.insertCell(3).innerText = task.status; // Добавляем статус в ячейку
             row.insertCell(4).innerText = task.priority; // Добавляем приоритет в ячейку
             row.insertCell(5).innerText = new Date(task.createdDate).toLocaleDateString(); // Дата создания
             row.insertCell(6).innerText = new Date(task.deadline).toLocaleDateString(); // Дата дедлайна
-            row.insertCell(7).innerHTML = task.comments.map((comment, index) => `${index + 1} / ${comment} <button onclick="removeComment('${comment}')">Удалить</button>`).join('<br>'); // Отображаем нумерованные комментарии с кнопками удаления
+            row.insertCell(7).innerHTML = task.comments.map((comment, index) => `${index + 1} / ${comment} <button onclick="removeCommentFromTask(${task.taskId}, ${index})">Удалить</button>`).join('<br>'); // Отображаем нумерованные комментарии с кнопками удаления
 
             // Создаем ячейку для кнопок "Редактировать" и "Удалить"
             const actionCell = row.insertCell(8);
@@ -138,13 +140,13 @@
             // Создаем кнопку для редактирования задачи
             const editButton = document.createElement('button');
             editButton.innerText = 'Редактировать'; // Текст на кнопке
-            editButton.onclick = () => editTask(task.id); // Устанавливаем обработчик на клик
+            editButton.onclick = () => editTask(task.taskId); // Устанавливаем обработчик на клик
             actionCell.appendChild(editButton); // Добавляем кнопку в ячейку
 
             // Создаем кнопку для удаления задачи
             const deleteButton = document.createElement('button');
             deleteButton.innerText = 'Удалить'; // Текст на кнопке
-            deleteButton.onclick = () => deleteTask(task.id); // Устанавливаем обработчик на клик
+            deleteButton.onclick = () => deleteTask(task.taskId); // Устанавливаем обработчик на клик
             actionCell.appendChild(deleteButton); // Добавляем кнопку в ячейку
         });
     }
@@ -227,13 +229,51 @@
         }
     }
 
-    // Функция для удаления комментария
+    // Функция для удаления комментария в модальном окне редактирования
     function removeComment(commentText) {
         // Удаляем комментарий из массива
         commentsArray = commentsArray.filter(comment => comment !== commentText);
 
         // Перезагружаем список комментариев
         reloadCommentsList();
+    }
+
+    // Удаление комментария непосредственно из таблицы задач
+    async function removeCommentFromTask(taskId, commentIndex) {
+        const token = localStorage.getItem('token');
+
+        // Получаем текущие данные задачи
+        const response = await fetch(`/tasks/${taskId}`, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+
+        if (!response.ok) {
+            alert('Ошибка при загрузке задачи');
+            return;
+        }
+
+        const task = await response.json();
+
+        // Удаляем комментарий по индексу
+        task.comments.splice(commentIndex, 1);
+
+        // Отправляем обновленную задачу на сервер
+        const updateResponse = await fetch(`/tasks/${taskId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify(task)
+        });
+
+        if (updateResponse.ok) {
+            fetchTasks();
+        } else {
+            alert('Ошибка при удалении комментария');
+        }
     }
 
     // Функция для перезагрузки списка комментариев
@@ -282,6 +322,12 @@
         } else {
             alert('Ошибка при обновлении задачи: ' + response.statusText); // Обработка ошибок
         }
+    }
+
+    // Функция выхода из системы
+    function logout() {
+        localStorage.removeItem('token');
+        window.location.href = '/api/auth/login';
     }
 
     fetchTasks(); // Загружаем задачи при загрузке страницы
