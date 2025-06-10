@@ -110,7 +110,12 @@
     let commentsArray = []; // Массив для хранения комментариев
 
     async function fetchTasks() {
-        const response = await fetch('/tasks'); // Выполняем GET-запрос для получения задач
+        const token = localStorage.getItem('token');
+        const response = await fetch('/tasks', {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
         const tasks = await response.json(); // Преобразуем ответ в JSON
         const tableBody = document.getElementById('taskTable').getElementsByTagName('tbody')[0];
         tableBody.innerHTML = ''; // Очищаем текущее содержимое таблицы

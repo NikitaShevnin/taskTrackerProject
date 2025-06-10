@@ -3,6 +3,8 @@ package ru.tz1.taskTracker.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import ru.tz1.taskTracker.entity.User;
 import ru.tz1.taskTracker.entity.UserRegistrationDto;
 import ru.tz1.taskTracker.repository.UserRepository;
@@ -13,6 +15,8 @@ import ru.tz1.taskTracker.repository.UserRepository;
  */
 @Service
 public class UserRegistrationService {
+
+    private static final Logger logger = LoggerFactory.getLogger(UserRegistrationService.class);
 
     @Autowired
     private UserRepository userRepository; // Репозиторий для работы с пользователями
@@ -28,14 +32,18 @@ public class UserRegistrationService {
      * @throws Exception Если возникла ошибка, например, если email уже занят или пароли не совпадают.
      */
     public String registerNewUser(UserRegistrationDto userDto) throws Exception {
+        logger.info("Attempting to register user with email: {}", userDto.getEmail());
+
         // Проверяем, существует ли пользователь с таким email
         if (userRepository.findByEmail(userDto.getEmail()) != null) {
-            throw new Exception("Email уже занят"); // Выбрасываем исключение, если email уже занят
+            logger.warn("Email already in use: {}", userDto.getEmail());
+            throw new Exception("Email уже занят");
         }
 
         // Проверяем, совпадают ли введенные пароли
         if (!userDto.getPassword().equals(userDto.getConfirmPassword())) {
-            throw new Exception("Пароли не совпадают"); // Выбрасываем исключение, если пароли не совпадают
+            logger.warn("Password confirmation does not match for user: {}", userDto.getEmail());
+            throw new Exception("Пароли не совпадают");
         }
 
         // Создаем нового пользователя
@@ -47,7 +55,7 @@ public class UserRegistrationService {
 
         // Сохраняем нового пользователя в базе данных
         userRepository.save(newUser);
-
-        return "Регистрация прошла успешно"; // Возвращаем сообщение об успешной регистрации
+        logger.info("User registered successfully: {}", userDto.getEmail());
+        return "Регистрация прошла успешно";
     }
 }
