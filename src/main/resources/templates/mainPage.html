@@ -151,8 +151,12 @@
 
     // Асинхронная функция для удаления задачи
     async function deleteTask(id) {
+        const token = localStorage.getItem('token');
         const response = await fetch(`/tasks/${id}`, {
-            method: 'DELETE' // Выполняем DELETE-запрос для удаления задачи по ID
+            method: 'DELETE',
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
         });
 
         if (response.ok) {
@@ -164,7 +168,12 @@
 
     // Асинхронная функция для редактирования задачи
     async function editTask(id) {
-        const response = await fetch(`/tasks/${id}`);
+        const token = localStorage.getItem('token');
+        const response = await fetch(`/tasks/${id}`, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
         if (!response.ok) {
             alert('Ошибка при загрузке задачи');
             return;
@@ -257,10 +266,12 @@
 
         console.log('Updating task with data:', updatedTask); // Логируем данные перед отправкой на сервер
 
+        const token = localStorage.getItem('token');
         const response = await fetch(`/tasks/${id}`, {
             method: 'PUT',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
             },
             body: JSON.stringify(updatedTask)
         });
