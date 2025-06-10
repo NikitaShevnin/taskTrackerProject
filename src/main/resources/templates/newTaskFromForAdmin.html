@@ -172,10 +172,12 @@
         console.log("Создаем новую задачу:", newTask); // Логируем объект задачи
 
         // Отправляем POST-запрос на создание задачи
+        const token = localStorage.getItem('token');
         fetch("/tasks", {
             method: "POST",
             headers: {
-                "Content-Type": "application/json"
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
             },
             body: JSON.stringify(newTask)
         })
